@@ -2558,7 +2558,7 @@ void PM_Jump( void )
 		return;		// in air, so no effect
 	}
 
-	if( pmove->oldbuttons & IN_JUMP )
+	if( pmove->oldbuttons & IN_JUMP && !pmove->movevars->bunnyhop )
 		return;		// don't pogo stick
 
 	// In the air now.
