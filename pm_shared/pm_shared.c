@@ -1028,36 +1028,33 @@ PM_Accelerate
 */
 void PM_Accelerate( vec3_t wishdir, float wishspeed, float accel )
 {
-	int i;
-	float addspeed, accelspeed, currentspeed;
-
 	// Dead player's don't accelerate
-	if( pmove->dead )
-		return;
+	/*if (pmove->dead)
+		return;*/
 
 	// If waterjumping, don't accelerate
 	if( pmove->waterjumptime )
 		return;
 
 	// See if we are changing direction a bit
-	currentspeed = DotProduct( pmove->velocity, wishdir );
+	float currentspeed = DotProduct( pmove->velocity, wishdir );
 
 	// Reduce wishspeed by the amount of veer.
-	addspeed = wishspeed - currentspeed;
+	float addspeed = wishspeed - currentspeed;
 
 	// If not going to add any speed, done.
 	if( addspeed <= 0 )
 		return;
 
 	// Determine amount of accleration.
-	accelspeed = accel * pmove->frametime * wishspeed * pmove->friction;
+	float accelspeed = accel * pmove->frametime * wishspeed * pmove->friction;
 	
 	// Cap at addspeed
 	if( accelspeed > addspeed )
 		accelspeed = addspeed;
 	
 	// Adjust velocity.
-	for( i = 0; i < 3; i++ )
+	for( int i = 0; i < 3; i++ )
 	{
 		pmove->velocity[i] += accelspeed * wishdir[i];	
 	}
@@ -2412,29 +2409,82 @@ PM_NoClip
 */
 void PM_NoClip()
 {
-	int i;
+	float maxacceleration = pmove->movevars->noclipspeed;
+	float factor = pmove->movevars->noclipspeed;
+
 	vec3_t wishvel;
-	float fmove, smove;
-	//float currentspeed, addspeed, accelspeed;
+	vec3_t forward, right, up;
+	vec3_t wishdir;
+	float wishspeed;
+	float maxspeed = pmove->movevars->maxspeed * factor;
 
-	// Copy movement amounts
-	fmove = pmove->cmd.forwardmove;
-	smove = pmove->cmd.sidemove;
+	AngleVectors(pmove->angles, forward, right, up);  // Determine movement angles
 
-	VectorNormalize( pmove->forward ); 
-	VectorNormalize( pmove->right );
-
-	for( i = 0; i < 3; i++ )       // Determine x and y parts of velocity
+	if (pmove->oldbuttons & IN_RUN)
 	{
-		wishvel[i] = pmove->forward[i] * fmove + pmove->right[i] * smove;
+		factor /= 2.0f;
 	}
-	wishvel[2] += pmove->cmd.upmove;
 
-	VectorMA (pmove->origin, pmove->frametime*pmove->movevars->noclipspeed, wishvel, pmove->origin );
+	float fmove = pmove->cmd.forwardmove * factor;
+	float smove = pmove->cmd.sidemove * factor;
+	VectorNormalize(forward);
+	VectorNormalize(right);
 
-	// Zero out the velocity so that we don't accumulate a huge downward velocity from
-	// gravity, etc.
-	VectorClear( pmove->velocity );
+	for (int i = 0; i < 3; i++)		// Determine x and y parts of velocity
+		wishvel[i] = forward[i] * fmove + right[i] * smove;
+	wishvel[2] += pmove->cmd.upmove * factor;
+
+	VectorCopy(wishvel, wishdir);	// Determine the magnitude of movement speed
+	wishspeed = VectorNormalize(wishdir);
+
+	// Clamp to server defined max speed
+	if (wishspeed > maxspeed)
+	{
+		VectorScale(wishvel, maxspeed / wishspeed, wishvel);
+		wishspeed = maxspeed;
+	}
+
+	if (maxacceleration > 0.0)
+	{
+		// Set pmove velocity
+		PM_Accelerate(wishdir, wishspeed, maxacceleration);
+
+		float spd = Length(pmove->velocity);
+		if (spd < 1.0f)
+		{
+			VectorClear(pmove->velocity);
+			return;
+		}
+
+		// Bleed off some speed, but if we have less than the bleed
+		//  threshhold, bleed the theshold amount.
+		float control = (spd < maxspeed / 4.0) ? maxspeed / 4.0 : spd;
+
+		// Add the amount to the drop amount.
+		float drop = control * pmove->friction * factor * pmove->frametime;
+
+		// scale the velocity
+		float newspeed = spd - drop;
+		if (newspeed < 0)
+			newspeed = 0;
+
+		// Determine proportion of old speed we are using.
+		newspeed /= spd;
+		VectorScale(pmove->velocity, newspeed, pmove->velocity);
+	}
+	else
+	{
+		VectorCopy(wishvel, pmove->velocity);
+	}
+
+	// Just move ( don't clip or anything )
+	VectorMA(pmove->origin, pmove->frametime, pmove->velocity, pmove->origin);
+
+	// Zero out velocity if in noaccel mode
+	if (maxacceleration < 0.0f)
+	{
+		VectorClear(pmove->velocity);
+	}
 }
 
 // Only allow bunny jumping up to 1.7x server / player maxspeed setting
