@@ -316,14 +316,17 @@ void CHudAmmo::Reset( void )
 int CHudAmmo::VidInit( void )
 {
 	// Load sprites for buckets (top row of weapon menu)
-	m_HUD_bucket0 = gHUD.GetSpriteIndex( "bucket1" );
-	m_HUD_selection = gHUD.GetSpriteIndex( "selection" );
+	//m_HUD_bucket0 = gHUD.GetSpriteIndex( "bucket1" );
+	//m_HUD_selection = gHUD.GetSpriteIndex( "selection" );
 
-	ghsprBuckets = gHUD.GetSprite( m_HUD_bucket0 );
-	giBucketWidth = gHUD.GetSpriteRect( m_HUD_bucket0 ).right - gHUD.GetSpriteRect( m_HUD_bucket0 ).left;
-	giBucketHeight = gHUD.GetSpriteRect( m_HUD_bucket0 ).bottom - gHUD.GetSpriteRect( m_HUD_bucket0 ).top;
+	//ghsprBuckets = gHUD.GetSprite( m_HUD_bucket0 );
+	//giBucketWidth = gHUD.GetSpriteRect( m_HUD_bucket0 ).right - gHUD.GetSpriteRect( m_HUD_bucket0 ).left;
+	//giBucketHeight = gHUD.GetSpriteRect( m_HUD_bucket0 ).bottom - gHUD.GetSpriteRect( m_HUD_bucket0 ).top;
+	giBucketWidth = 192;
+	giBucketHeight = 64;
 
-	gHR.iHistoryGap = Q_max( gHR.iHistoryGap, gHUD.GetSpriteRect( m_HUD_bucket0 ).bottom - gHUD.GetSpriteRect( m_HUD_bucket0 ).top );
+
+	gHR.iHistoryGap = Q_max( gHR.iHistoryGap, giBucketHeight );
 
 	// If we've already loaded weapons, let's get new sprites
 	gWR.LoadAllWeaponSprites();
@@ -836,6 +839,7 @@ int CHudAmmo::Draw( float flTime )
 {
 	int a, x, y, r, g, b;
 	int AmmoWidth;
+	int AmmoHeight;
 
 	if( !( gHUD.m_iWeaponBits & ( 1 << ( WEAPON_SUIT ) ) ) )
 		return 1;
@@ -865,6 +869,8 @@ int CHudAmmo::Draw( float flTime )
 
 	AmmoWidth = gHUD.GetSpriteRect( gHUD.m_HUD_number_0 ).right - gHUD.GetSpriteRect( gHUD.m_HUD_number_0 ).left;
 
+	AmmoHeight = gHUD.GetSpriteRect( gHUD.m_HUD_number_0 ).bottom - gHUD.GetSpriteRect( gHUD.m_HUD_number_0 ).top;
+
 	a = (int)Q_max( MIN_ALPHA, m_fFade );
 
 	if( m_fFade > 0 )
@@ -882,10 +888,12 @@ int CHudAmmo::Draw( float flTime )
 	{
 		int iIconWidth = m_pWeapon->rcAmmo.right - m_pWeapon->rcAmmo.left;
 
+
 		if( pw->iClip >= 0 )
 		{
 			// room for the number and the '|' and the current ammo
 			x = ScreenWidth - ( 8 * AmmoWidth ) - iIconWidth;
+			gEngfuncs.pfnFillRGBABlend(x-8, y-8, AmmoWidth*8+16, AmmoHeight+16, 0, 0, 0, 127);
 			x = gHUD.DrawHudNumber( x, y, iFlags | DHN_3DIGITS, pw->iClip, r, g, b );
 
 			/*wrect_t rc;
@@ -913,6 +921,7 @@ int CHudAmmo::Draw( float flTime )
 		{
 			// SPR_Draw a bullets only line
 			x = ScreenWidth - 4 * AmmoWidth - iIconWidth;
+			gEngfuncs.pfnFillRGBABlend(x - 8, y - 8, AmmoWidth * 4 + 16, AmmoHeight + 16, 0, 0, 0, 127);
 			x = gHUD.DrawHudNumber( x, y, iFlags | DHN_3DIGITS, gWR.CountAmmo( pw->iAmmoType ), r, g, b );
 		}
 
@@ -930,8 +939,11 @@ int CHudAmmo::Draw( float flTime )
 		// Do we have secondary ammo?
 		if( ( pw->iAmmo2Type != 0 ) && ( gWR.CountAmmo( pw->iAmmo2Type ) > 0 ) )
 		{
-			y -= gHUD.m_iFontHeight + gHUD.m_iFontHeight / 4;
+			y -= gHUD.m_iFontHeight*2;
 			x = ScreenWidth - 4 * AmmoWidth - iIconWidth;
+
+			gEngfuncs.pfnFillRGBABlend(x - 8, y - 8, AmmoWidth * 4 + 16, gHUD.m_iFontHeight + 16, 0, 0, 0, 127);
+
 			x = gHUD.DrawHudNumber( x, y, iFlags | DHN_3DIGITS, gWR.CountAmmo( pw->iAmmo2Type ), r, g, b );
 
 			// Draw the ammo Icon
@@ -1018,7 +1030,7 @@ int CHudAmmo::DrawWList( float flTime )
 	else 
 		iActiveSlot = gpActiveSel->iSlot;
 
-	x = 10; //!!!
+	x = ScreenWidth/2 - (giBucketWidth * MAX_WEAPON_SLOTS) / 2; //!!!
 	y = 10; //!!!
 
 	// Ensure that there are available choices in the active slot
@@ -1030,7 +1042,7 @@ int CHudAmmo::DrawWList( float flTime )
 			iActiveSlot = -1;
 		}
 	}
-
+	/*
 	// Draw top line
 	for( i = 0; i < MAX_WEAPON_SLOTS; i++ )
 	{
@@ -1044,7 +1056,7 @@ int CHudAmmo::DrawWList( float flTime )
 			a = 192;
 
 		ScaleColors( r, g, b, 255 );
-		SPR_Set( gHUD.GetSprite( m_HUD_bucket0 + i ), r, g, b );
+		//SPR_Set( gHUD.GetSprite( m_HUD_bucket0 + i ), r, g, b );
 
 		// make active slot wide enough to accomodate gun pictures
 		if( i == iActiveSlot )
@@ -1058,18 +1070,20 @@ int CHudAmmo::DrawWList( float flTime )
 		else
 			iWidth = giBucketWidth;
 
-		SPR_DrawAdditive( 0, x, y, &gHUD.GetSpriteRect( m_HUD_bucket0 + i ) );
+		FillRGBA(x, y, giBucketWidth, giBucketHeight, 255,255,255,127);
+		
+		//SPR_DrawAdditive( 0, x, y, &gHUD.GetSpriteRect( m_HUD_bucket0 + i ) );
 		
 		x += iWidth + 5;
 	}
-
+	*/
 	a = 128; //!!!
-	x = 10;
+	x = ScreenWidth / 2 - giBucketWidth* MAX_WEAPON_SLOTS/2;
 
 	// Draw all of the buckets
 	for( i = 0; i < MAX_WEAPON_SLOTS; i++ )
 	{
-		y = giBucketHeight + 10;
+		y = 10;
 
 		// If this is the active slot, draw the bigger pictures,
 		// otherwise just draw boxes
@@ -1077,9 +1091,12 @@ int CHudAmmo::DrawWList( float flTime )
 		{
 			WEAPON *p = gWR.GetFirstPos( i );
 			int iWidth = giBucketWidth;
-			if( p )
+			int iHeight = giBucketHeight;
+			if (p)
+			{
 				iWidth = p->rcActive.right - p->rcActive.left;
-
+				iHeight = p->rcActive.bottom - p->rcActive.top;
+			}
 			for( int iPos = 0; iPos < MAX_WEAPON_POSITIONS; iPos++ )
 			{
 				p = gWR.GetWeaponSlot( i, iPos );
@@ -1089,14 +1106,17 @@ int CHudAmmo::DrawWList( float flTime )
 
 				UnpackRGB( r, g, b, RGB_YELLOWISH );
 
+				gEngfuncs.pfnFillRGBABlend(x,y, giBucketWidth, giBucketHeight, 0, 0, 0, 127);
+
 				// if active, then we must have ammo.
 				if( gpActiveSel == p )
 				{
 					SPR_Set( p->hActive, r, g, b );
-					SPR_DrawAdditive( 0, x, y, &p->rcActive );
+					SPR_DrawAdditive( 0, x + giBucketWidth / 2 - iWidth / 2, y + giBucketHeight / 2 - iHeight / 2, &p->rcActive );
 
-					SPR_Set( gHUD.GetSprite( m_HUD_selection ), r, g, b );
-					SPR_DrawAdditive( 0, x, y, &gHUD.GetSpriteRect( m_HUD_selection ) );
+
+					//SPR_Set( gHUD.GetSprite( m_HUD_selection ), r, g, b );
+					//SPR_DrawAdditive( 0, x, y, &gHUD.GetSpriteRect( m_HUD_selection ) );
 				}
 				else
 				{
@@ -1110,21 +1130,21 @@ int CHudAmmo::DrawWList( float flTime )
 					}
 
 					SPR_Set( p->hInactive, r, g, b );
-					SPR_DrawAdditive( 0, x, y, &p->rcInactive );
+					SPR_DrawAdditive( 0, x + giBucketWidth / 2 - iWidth / 2, y + giBucketHeight / 2 - iHeight / 2, &p->rcInactive );
 				}
 
 				// Draw Ammo Bar
 				DrawAmmoBar( p, x + giABWidth / 2, y, giABWidth, giABHeight );
 				
-				y += p->rcActive.bottom - p->rcActive.top + 5;
+				y += giBucketHeight + 5;
 			}
 
-			x += iWidth + 5;
+			x += giBucketWidth + 5;
 		}
 		else
 		{
 			// Draw Row of weapons.
-			UnpackRGB( r, g, b, RGB_YELLOWISH );
+			UnpackRGB( r, g, b, 0x00000000);
 
 			for( int iPos = 0; iPos < MAX_WEAPON_POSITIONS; iPos++ )
 			{
@@ -1135,7 +1155,7 @@ int CHudAmmo::DrawWList( float flTime )
 
 				if( gWR.HasAmmo( p ) )
 				{
-					UnpackRGB( r, g, b, RGB_YELLOWISH );
+					UnpackRGB( r, g, b, 0x00000000 );
 					a = 128;
 				}
 				else
@@ -1144,9 +1164,9 @@ int CHudAmmo::DrawWList( float flTime )
 					a = 96;
 				}
 
-				FillRGBA( x, y, giBucketWidth, giBucketHeight, r, g, b, a );
+				gEngfuncs.pfnFillRGBABlend( x, y, giBucketWidth, giBucketHeight/2, r, g, b, a );
 
-				y += giBucketHeight + 5;
+				y += giBucketHeight/2 + 5;
 			}
 
 			x += giBucketWidth + 5;

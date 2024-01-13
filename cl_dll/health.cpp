@@ -221,6 +221,8 @@ int CHudHealth::Draw( float flTime )
 		y = ScreenHeight - gHUD.m_iFontHeight - gHUD.m_iFontHeight / 2;
 		x = CrossWidth / 2;
 
+		gEngfuncs.pfnFillRGBABlend(x-8, y-8, HealthWidth*4+16, gHUD.m_iFontHeight+16, 0, 0, 0, 127);
+
 		SPR_Set( gHUD.GetSprite( m_HUD_cross ), r, g, b );
 		SPR_DrawAdditive( 0, x, y, &gHUD.GetSpriteRect( m_HUD_cross ) );
 
@@ -230,10 +232,10 @@ int CHudHealth::Draw( float flTime )
 
 		x += HealthWidth / 2;
 
-		int iHeight = gHUD.m_iFontHeight;
-		int iWidth = HealthWidth / 10;
-		UnpackRGB( r, g, b, RGB_YELLOWISH );
-		FillRGBA( x, y, iWidth, iHeight, r, g, b, a );
+		//int iHeight = gHUD.m_iFontHeight;
+		//int iWidth = HealthWidth / 10;
+		//UnpackRGB( r, g, b, RGB_YELLOWISH );
+		//FillRGBA( x, y, iWidth, iHeight, r, g, b, a );
 	}
 
 	DrawDamage( flTime );

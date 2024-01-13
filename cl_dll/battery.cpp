@@ -109,7 +109,10 @@ int CHudBattery::Draw( float flTime )
 	int iOffset = ( m_prc1->bottom - m_prc1->top ) / 6;
 
 	y = ScreenHeight - gHUD.m_iFontHeight - gHUD.m_iFontHeight / 2;
-	x = ScreenWidth / 5;
+	int SuitWidth = gHUD.GetSpriteRect(gHUD.m_HUD_number_0).right - gHUD.GetSpriteRect(gHUD.m_HUD_number_0).left;
+
+	x = SuitWidth*6;
+
 
 	// make sure we have the right sprite handles
 	if( !m_hSprite1 )
@@ -117,6 +120,9 @@ int CHudBattery::Draw( float flTime )
 	if( !m_hSprite2 )
 		m_hSprite2 = gHUD.GetSprite( gHUD.GetSpriteIndex( "suit_full" ) );
 
+	int SpriteWidth = m_prc1->right - m_prc1->left;
+
+	gEngfuncs.pfnFillRGBABlend(x-8, y-8, SpriteWidth + SuitWidth * 4+16, gHUD.m_iFontHeight+16, 0, 0, 0, 127);
 	SPR_Set( m_hSprite1, r, g, b );
 	SPR_DrawAdditive( 0,  x, y - iOffset, m_prc1 );
 
@@ -126,7 +132,7 @@ int CHudBattery::Draw( float flTime )
 		SPR_DrawAdditive( 0, x, y - iOffset + ( rc.top - m_prc2->top ), &rc );
 	}
 
-	x += ( m_prc1->right - m_prc1->left );
+	x += SpriteWidth;
 	x = gHUD.DrawHudNumber( x, y, DHN_3DIGITS | DHN_DRAWZERO, m_iBat, r, g, b );
 
 	return 1;
