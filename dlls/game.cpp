@@ -26,6 +26,7 @@ cvar_t fragsleft	= { "mp_fragsleft","0", FCVAR_SERVER | FCVAR_UNLOGGED };	  // D
 cvar_t timeleft		= { "mp_timeleft","0" , FCVAR_SERVER | FCVAR_UNLOGGED };	  // "      "
 
 // multiplayer server rules
+cvar_t allowthirdperson = { "mp_allowthirdperson","0", FCVAR_SERVER };
 cvar_t teamplay		= { "mp_teamplay","0", FCVAR_SERVER };
 cvar_t fraglimit	= { "mp_fraglimit","0", FCVAR_SERVER };
 cvar_t timelimit	= { "mp_timelimit","0", FCVAR_SERVER };
@@ -47,7 +48,7 @@ cvar_t teamlist		= { "mp_teamlist","hgrunt;scientist", FCVAR_SERVER };
 cvar_t teamoverride	= { "mp_teamoverride","1" };
 cvar_t defaultteam	= { "mp_defaultteam","0" };
 cvar_t allowmonsters	= { "mp_allowmonsters","0", FCVAR_SERVER };
-cvar_t bhopcap		= { "mp_bhopcap", "1", FCVAR_SERVER };
+cvar_t bhopcap		= { "mp_bhopcap", "0", FCVAR_SERVER };
 
 cvar_t allow_spectators = { "allow_spectators", "0", FCVAR_SERVER };	// 0 prevents players from being spectators
 cvar_t multibyte_only = { "mp_multibyte_only", "0", FCVAR_SERVER };
@@ -480,6 +481,7 @@ void GameDLLInit( void )
 	CVAR_REGISTER( &fraglimit );
 	CVAR_REGISTER( &timelimit );
 
+	CVAR_REGISTER( &allowthirdperson );
 	CVAR_REGISTER( &fragsleft );
 	CVAR_REGISTER( &timeleft );
 

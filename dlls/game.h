@@ -21,6 +21,7 @@ extern void GameDLLInit( void );
 extern cvar_t displaysoundlist;
 
 // multiplayer server rules
+extern cvar_t allowthirdperson;
 extern cvar_t teamplay;
 extern cvar_t fraglimit;
 extern cvar_t timelimit;

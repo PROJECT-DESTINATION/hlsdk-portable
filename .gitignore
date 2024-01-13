@@ -39,13 +39,6 @@ local.properties
 .project
 .classpath
 .settings
-.depproj/server.vcxproj.filters
-.depproj/server.vcxproj
-.depproj/project_view.vcxproj.filters
-.depproj/project_view.vcxproj
-.depproj/install_all_projects.vcxproj.filters
-.depproj/install_all_projects.vcxproj
-.depproj/client.vcxproj.filters
-.depproj/client.vcxproj
-.depproj/build_all_projects.vcxproj.filters
-.depproj/build_all_projects.vcxproj
+.depproj/*
+
+*.lastbuildstate
