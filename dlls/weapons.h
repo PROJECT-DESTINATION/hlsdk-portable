@@ -17,6 +17,8 @@
 #define WEAPONS_H
 
 #include "effects.h"
+#include "vdf/vdf.h"
+#include "map/map.h"
 
 class CBasePlayer;
 extern int gmsgWeapPickup;
@@ -273,6 +275,8 @@ public:
 	// int		m_iIdPrimary;										// Unique Id for primary ammo
 	// int		m_iIdSecondary;										// Unique Id for secondary ammo
 };
+
+extern map_vdf_t* weaponscripts;
 
 // inventory items that 
 class CBasePlayerWeapon : public CBasePlayerItem

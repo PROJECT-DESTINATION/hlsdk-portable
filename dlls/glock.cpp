@@ -74,6 +74,7 @@ void CGlock::Precache( void )
 
 int CGlock::GetItemInfo( ItemInfo *p )
 {
+	
 	p->pszName = STRING( pev->classname );
 	p->pszAmmo1 = "9mm";
 	p->iMaxAmmo1 = _9MM_MAX_CARRY;

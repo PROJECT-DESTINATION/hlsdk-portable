@@ -30,8 +30,7 @@
 #include "soundent.h"
 #include "decals.h"
 #include "gamerules.h"
-#include "vdf/vdf.h"
-#include "map/map.h"
+
 
 extern CGraph WorldGraph;
 extern int gEvilImpulse101;
@@ -994,10 +993,26 @@ BOOL CBasePlayerWeapon::DefaultDeploy( const char *szViewModel, const char *szWe
 		return FALSE;
 	}
 
+	vdf_object_t* v_weaponmodel = vdf_object_index_array_str(*weaponscript, "playermodel");
+
+	if (!v_weaponmodel)
+	{
+		UTIL_LogPrintf("Cant get weaponmodel from weaponscript \"%s\"\n", m_sWeaponscript);
+		return FALSE;
+	}
+
+	vdf_object_t* v_animExtension = vdf_object_index_array_str(*weaponscript, "anim_prefix");
+
+	if (!v_animExtension)
+	{
+		UTIL_LogPrintf("Cant get weaponmodel from weaponscript \"%s\"\n", m_sWeaponscript);
+		return FALSE;
+	}
+
 	m_pPlayer->TabulateAmmo();
 	m_pPlayer->pev->viewmodel = MAKE_STRING(vdf_object_get_string(v_viewmodel));
-	m_pPlayer->pev->weaponmodel = MAKE_STRING( szWeaponModel );
-	strcpy( m_pPlayer->m_szAnimExtention, szAnimExt );
+	m_pPlayer->pev->weaponmodel = MAKE_STRING(vdf_object_get_string(v_weaponmodel));
+	strcpy( m_pPlayer->m_szAnimExtention, vdf_object_get_string(v_animExtension));
 	SendWeaponAnim( iAnim, skiplocal, body );
 
 	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.5f;
