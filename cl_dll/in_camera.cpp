@@ -477,6 +477,7 @@ void CAM_OutUp( void )
 
 void CAM_ToThirdPerson( void )
 {
+	
 	if (gEngfuncs.pfnGetCvarFloat("mp_allowthirdperson") == 0)
 		return;
 
