@@ -30,6 +30,8 @@
 #include "soundent.h"
 #include "decals.h"
 #include "gamerules.h"
+#include "vdf/vdf.h"
+#include "map/map.h"
 
 extern CGraph WorldGraph;
 extern int gEvilImpulse101;
@@ -52,6 +54,10 @@ AmmoInfo CBasePlayerItem::AmmoInfoArray[MAX_AMMO_SLOTS];
 extern int gmsgCurWeapon;
 
 MULTIDAMAGE gMultiDamage;
+
+static map_vdf_t s_weaponscripts;
+map_vdf_t* weaponscripts = &s_weaponscripts;
+
 
 #define TRACER_FREQ		4			// Tracers fire every fourth bullet
 
@@ -399,6 +405,10 @@ TYPEDESCRIPTION	CBasePlayerItem::m_SaveData[] =
 };
 
 IMPLEMENT_SAVERESTORE( CBasePlayerItem, CBaseAnimating )
+
+
+
+
 
 TYPEDESCRIPTION	CBasePlayerWeapon::m_SaveData[] =
 {
@@ -961,13 +971,31 @@ BOOL CBasePlayerWeapon::CanDeploy( void )
 	return TRUE;
 }
 
+
+
 BOOL CBasePlayerWeapon::DefaultDeploy( const char *szViewModel, const char *szWeaponModel, int iAnim, const char *szAnimExt, int skiplocal /* = 0 */, int body )
 {
 	if( !CanDeploy() )
 		return FALSE;
+	
+	vdf_object_t** weaponscript = map_get(weaponscripts, m_sWeaponscript, vdf_object_t*);
+
+	if (!weaponscript)
+	{
+		UTIL_LogPrintf("Weapon has no weaponscript \"%s\"\n", m_sWeaponscript);
+		return FALSE;
+	}
+
+	vdf_object_t* v_viewmodel = vdf_object_index_array_str(*weaponscript, "viewmodel");
+
+	if (!v_viewmodel)
+	{
+		UTIL_LogPrintf("Cant get viewmodel from weaponscript \"%s\"\n", m_sWeaponscript);
+		return FALSE;
+	}
 
 	m_pPlayer->TabulateAmmo();
-	m_pPlayer->pev->viewmodel = MAKE_STRING( szViewModel );
+	m_pPlayer->pev->viewmodel = MAKE_STRING(vdf_object_get_string(v_viewmodel));
 	m_pPlayer->pev->weaponmodel = MAKE_STRING( szWeaponModel );
 	strcpy( m_pPlayer->m_szAnimExtention, szAnimExt );
 	SendWeaponAnim( iAnim, skiplocal, body );
@@ -1203,6 +1231,24 @@ float CBasePlayerWeapon::GetNextAttackDelay( float delay )
 	//OutputDebugString( szMsg );
 	return flNextAttack;
 }
+
+bool CBasePlayerWeapon::LoadWeaponScript(const char* path)
+{
+	vdf_object_t* script;
+	vdf_object_t* viewmodel;
+	if (!(map_get(weaponscripts, path, vdf_object_t*)))
+	{
+		script = vdf_parse_file(path);
+		if (!script)
+		{
+			UTIL_LogPrintf("Could not parse file \"%s\"", path);
+			return false;
+		}
+		map_set(weaponscripts, path, script);
+	}
+	strncpy(m_sWeaponscript, path, 128);
+}
+
 //*********************************************************
 // weaponbox code:
 //*********************************************************

@@ -34,7 +34,10 @@ This file contains "stubs" of class member implementations so that we can predic
 // Globals used by game logic
 const Vector g_vecZero = Vector( 0, 0, 0 );
 int gmsgWeapPickup = 0;
-enginefuncs_t g_engfuncs;
+extern "C"
+{
+	enginefuncs_t g_engfuncs;
+}
 globalvars_t *gpGlobals;
 
 ItemInfo CBasePlayerItem::ItemInfoArray[MAX_WEAPONS];

@@ -52,6 +52,9 @@ void CGlock::Spawn()
 
 void CGlock::Precache( void )
 {
+#ifndef CLIENT_DLL
+	LoadWeaponScript("scripts/weapon_glock.txt");
+#endif
 	PRECACHE_MODEL( "models/v_9mmhandgun.mdl" );
 	PRECACHE_MODEL( "models/w_9mmhandgun.mdl" );
 	PRECACHE_MODEL( "models/p_9mmhandgun.mdl" );

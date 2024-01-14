@@ -22,7 +22,10 @@
 #undef SERVER_EXECUTE
 
 // Must be provided by user of this code
-extern enginefuncs_t g_engfuncs;
+extern "C"
+{
+	extern enginefuncs_t g_engfuncs;
+}
 
 // The actual engine callbacks
 #define GETPLAYERUSERID (*g_engfuncs.pfnGetPlayerUserId)

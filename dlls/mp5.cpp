@@ -66,6 +66,9 @@ void CMP5::Spawn()
 
 void CMP5::Precache( void )
 {
+#ifndef CLIENT_DLL
+	LoadWeaponScript("scripts/weapon_mp5.txt");
+#endif
 	PRECACHE_MODEL( "models/v_9mmAR.mdl" );
 	PRECACHE_MODEL( "models/w_9mmAR.mdl" );
 	PRECACHE_MODEL( "models/p_9mmAR.mdl" );

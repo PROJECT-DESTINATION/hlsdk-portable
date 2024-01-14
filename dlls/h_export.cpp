@@ -26,7 +26,10 @@
 #include "cbase.h"
 
 // Holds engine functionality callbacks
-enginefuncs_t	 g_engfuncs;
+extern "C"
+{
+	enginefuncs_t	 g_engfuncs;
+}
 globalvars_t	*gpGlobals;
 
 #if XASH_WIN32

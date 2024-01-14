@@ -48,6 +48,9 @@ enum crowbar_e
 
 void CCrowbar::Spawn()
 {
+#ifndef CLIENT_DLL
+	LoadWeaponScript("scripts/weapon_crowbar.txt");
+#endif
 	Precache();
 	m_iId = WEAPON_CROWBAR;
 	SET_MODEL( ENT( pev ), "models/w_crowbar.mdl" );

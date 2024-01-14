@@ -16,6 +16,8 @@
 #include "eiface.h"
 #include "util.h"
 #include "game.h"
+#include "vdf/vdf.h"
+#include "map/map.h"
 
 BOOL		g_fIsXash3D;
 
@@ -456,12 +458,16 @@ cvar_t	sk_player_leg1	= { "sk_player_leg1","1" };
 cvar_t	sk_player_leg2	= { "sk_player_leg2","1" };
 cvar_t	sk_player_leg3	= { "sk_player_leg3","1" };
 
+extern map_vdf_t* weaponscripts;
+
 // END Cvars for Skill Level settings
 
 // Register your console variables here
 // This gets called one time when the game is initialied
 void GameDLLInit( void )
 {
+	map_init(weaponscripts);
+
 	// Register cvars here:
 	if( CVAR_GET_POINTER( "build" ) )
 		g_fIsXash3D = TRUE;
