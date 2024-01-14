@@ -34,6 +34,8 @@ NSWITCH_ENVVARS = ['DEVKITPRO']
 
 PSVITA_ENVVARS = ['VITASDK']
 
+PS3_ENVVARS = ['SCE_PS3_ROOT']
+
 # This class does support ONLY r10e and r19c/r20 NDK
 class Android:
 	ctx            = None # waf context
@@ -498,6 +500,77 @@ class PSVita:
 		ldflags = []
 		return ldflags
 
+class PS3:
+	ctx			= None # waf context
+	arch		= 'SNC'
+	ps3sdk_dir	= None
+
+	def __init__(self, ctx):
+		self.ctx = ctx
+
+		for i in PS3_ENVVARS:
+			self.ps3sdk_dir = os.getenv(i)
+			if self.ps3sdk_dir != None:
+				break
+		else:
+			ctx.fatal('Set %s environment variable pointing to the PS3 directory!' %
+				' or '.join(PS3_ENVVARS))
+
+	def gen_toolchain_prefix(self):
+		return 'ppu-lv2-'
+
+	def gen_gcc_toolchain_path(self):
+		return os.path.join(self.ps3sdk_dir, 'host-win32/ppu/bin', self.gen_toolchain_prefix())
+		
+	def gen_ps3ppusnc_path(self):
+		return os.path.join(self.ps3sdk_dir, 'host-win32/sn/bin/ps3ppusnc.exe')
+
+	def cc(self):
+		return self.gen_ps3ppusnc_path()
+
+	def cxx(self):
+		return self.gen_ps3ppusnc_path()
+
+	def strip(self):
+		return self.gen_gcc_toolchain_path() + 'strip.exe'
+
+	def ar(self):
+		return self.gen_gcc_toolchain_path() + 'ar.exe'
+
+	def pkgconfig(self):
+		return self.gen_gcc_toolchain_path() + 'pkg-config.exe'
+
+	def cflags(self, cxx = False):
+		cflags = []
+		# arch flags
+		cflags += ['-D__ps3__']#, '-mtune=cellbe'] #, '-mfpu=neon']
+		# necessary linker flags
+		#cflags += ['-Wl,-q', '-Wl,-z']#,nocopyreloc']
+		# this optimization is broken in ps3sdk
+		cflags += ['-fno-optimize-sibling-calls']
+		# disable some ARM bullshit
+		cflags += ['-fno-short-enums']#, '-Wno-attributes']
+		# base include dir
+		cflags += ['-isystem %s\\target\\ppu\\include' % self.ps3sdk_dir]
+		cflags += ['-I%s\\target\\ppu\\include' % self.ps3sdk_dir]
+		cflags += ['-Ilibsn.a;libm.a;libio_stub.a;libfs_stub.a;$(SCE_PS3_ROOT)\target\ppu\lib\libdbg_libio_stub.a;$(SCE_PS3_ROOT)\target\ppu\lib\libc_stub.a;$(SCE_PS3_ROOT)\target\ppu\lib\libm.a;$(SCE_PS3_ROOT)\target\ppu\lib\libsysutil_np_trophy_stub.a;$(SCE_PS3_ROOT)\target\ppu\lib\libio_stub.a;$(SCE_PS3_ROOT)\target\ppu\lib\libsysutil_stub.a;$(SCE_PS3_ROOT)\target\ppu\lib\libsysmodule_stub.a;$(SCE_PS3_ROOT)\target\ppu\lib\libsyscall.a;$(SCE_PS3_ROOT)\target\ppu\lib\libgcm_sys_stub.a;$(SCE_PS3_ROOT)\host-win32\spu\lib\gcc\spu-lv2\4.1.1\libgcc.a;$(SCE_PS3_ROOT)\target\ppu\lib\libpadfilter.a;$(SCE_PS3_ROOT)\target\ppu\lib\libstdc++.a;$(SCE_PS3_ROOT)\host-win32\ppu\lib\gcc\ppu-lv2\4.1.1\libsupc++.a;$(SCE_PS3_ROOT)\target\ppu\lib\libsysutil_oskdialog_ext_stub.a;$(SCE_PS3_ROOT)\target\ppu\lib\libnet_stub.a'.replace("$(SCE_PS3_ROOT)", self.ps3sdk_dir)]
+		# SDL include dir
+		#cflags += ['-I%s/ppu-lv2/include/SDL2' % self.ps3sdk_dir]
+		if cxx == True:
+			cflags += ['-Xstd=cpp11']
+		return cflags
+
+	# they go before object list
+	def linkflags(self):
+		linkflags = ['-Wl,--hash-style=sysv', '-Wl,-q', '-Wl,-z']#,nocopyreloc']#, '-mtune=cortex-a9', '-mfpu=neon']
+		# enforce no-short-enums again
+		linkflags += ['-Wl,-no-enum-size-warning', '-fno-short-enums']
+		return linkflags
+
+	def ldflags(self):
+		ldflags = []
+		return ldflags
+
 def options(opt):
 	xc = opt.add_option_group('Cross compile options')
 	xc.add_option('--android', action='store', dest='ANDROID_OPTS', default=None,
@@ -510,6 +583,8 @@ def options(opt):
 		help ='enable building for Nintendo Switch [default: %default]')
 	xc.add_option('--psvita', action='store_true', dest='PSVITA', default = False,
 		help ='enable building for PlayStation Vita [default: %default]')
+	xc.add_option('--ps3', action='store_true', dest='PS3', default = False,
+		help ='enable building for PlayStation 3 [default: %default]')
 
 def configure(conf):
 	if conf.options.ANDROID_OPTS:
@@ -590,10 +665,27 @@ def configure(conf):
 		conf.env.LIB_M = ['m']
 		conf.env.VRTLD = ['vrtld']
 		conf.env.DEST_OS = 'psvita'
+	elif conf.options.PS3:
+		conf.ps3 = ps3 = PS3(conf)
+		conf.environ['CC'] = ps3.cc()
+		conf.environ['CXX'] = ps3.cxx()
+		conf.environ['STRIP'] = ps3.strip()
+		conf.environ['AR'] = ps3.ar()
+		conf.env.PKGCONFIG = ps3.pkgconfig()
+		conf.env.CFLAGS += ps3.cflags()
+		conf.env.CXXFLAGS += ps3.cflags(True)
+		conf.env.LINKFLAGS += ps3.linkflags()
+		conf.env.LDFLAGS += ps3.ldflags()
+		conf.env.HAVE_M = True
+		conf.env.LIB_M = ['m']
+		conf.env.VRTLD = ['vrtld']
+		conf.env.DEST_OS = 'ps3'
+		conf.env.COMPILER_CXX = 'g++'
+		conf.env.COMPILER_CC = 'gcc'
 
 	conf.env.MAGX = conf.options.MAGX
 	conf.env.MSVC_WINE = conf.options.MSVC_WINE
-	MACRO_TO_DESTOS = OrderedDict({ '__ANDROID__' : 'android', '__SWITCH__' : 'nswitch', '__vita__' : 'psvita' })
+	MACRO_TO_DESTOS = OrderedDict({ '__ANDROID__' : 'android', '__SWITCH__' : 'nswitch', '__vita__' : 'psvita', '__ps3__' : 'ps3' })
 	for k in c_config.MACRO_TO_DESTOS:
 		MACRO_TO_DESTOS[k] = c_config.MACRO_TO_DESTOS[k] # ordering is important
 	c_config.MACRO_TO_DESTOS  = MACRO_TO_DESTOS

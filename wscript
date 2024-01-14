@@ -87,6 +87,12 @@ def configure(conf):
 		conf.env.append_unique('CXXFLAGS_cxxshlib', ['-fPIC', '-fno-use-cxa-atexit'])
 		conf.env.append_unique('LINKFLAGS_cshlib', ['-nostdlib', '-Wl,--unresolved-symbols=ignore-all'])
 		conf.env.append_unique('LINKFLAGS_cxxshlib', ['-nostdlib', '-Wl,--unresolved-symbols=ignore-all'])
+		# same on the vita
+	elif conf.env.DEST_OS == 'ps3':
+		conf.env.append_unique('CFLAGS_cshlib', ['-fPIC'])
+		conf.env.append_unique('CXXFLAGS_cxxshlib', ['-fPIC', '-fno-use-cxa-atexit'])
+		conf.env.append_unique('LINKFLAGS_cshlib', ['-nostdlib', '-Wl,--unresolved-symbols=ignore-all'])
+		conf.env.append_unique('LINKFLAGS_cxxshlib', ['-nostdlib', '-Wl,--unresolved-symbols=ignore-all'])
 	# check if we need to use irix linkflags
 	elif conf.env.DEST_OS == 'irix' and conf.env.COMPILER_CC == 'gcc':
 		linkflags.remove('-Wl,--no-undefined')
@@ -102,7 +108,7 @@ def configure(conf):
 	conf.env.append_unique('CXXFLAGS', cxxflags)
 	conf.env.append_unique('LINKFLAGS', linkflags)
 
-	if conf.env.COMPILER_CC != 'msvc' and not conf.options.DISABLE_WERROR:
+	if conf.env.COMPILER_CC != 'msvc' and not conf.options.DISABLE_WERROR and not conf.env.DEST_OS == "ps3":
 		opt_flags = [
 			# '-Wall', '-Wextra', '-Wpedantic',
 			'-fdiagnostics-color=always',
@@ -145,7 +151,7 @@ def configure(conf):
 			'-Werror=implicit-int',
 			'-Werror=implicit-function-declaration',
 			'-Werror=incompatible-pointer-types',
-			'-Werror=int-conversion',
+				'-Werror=int-conversion',
 			'-Werror=jump-misses-init',
 			# '-Werror=old-style-declaration',
 			# '-Werror=old-style-definition',
@@ -201,7 +207,9 @@ def configure(conf):
 	elif conf.env.COMPILER_CC == 'owcc':
 		pass
 	else:
-		conf.env.append_unique('CXXFLAGS', ['-Wno-invalid-offsetof', '-fno-exceptions'])
+		if not conf.env.DEST_OS == "ps3": 
+			conf.env.append_unique('CXXFLAGS', ['-Wno-invalid-offsetof'])
+		conf.env.append_unique('CXXFLAGS', ['-fno-exceptions'])
 		conf.define('stricmp', 'strcasecmp', quote=False)
 		conf.define('strnicmp', 'strncasecmp', quote=False)
 		conf.define('_snprintf', 'snprintf', quote=False)

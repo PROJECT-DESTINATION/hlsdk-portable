@@ -16,6 +16,10 @@
 #if !defined(VECTOR_H)
 #define VECTOR_H
 
+#ifdef __ps3__
+using _CSTD sqrt;
+#endif
+
 //=========================================================
 // 2DVector - used for many pathfinding and many other 
 // operations that are treated as planar rather than 3d.
