@@ -411,6 +411,9 @@ LINK_ENTITY_TO_CLASS( weapon_snark, CSqueak )
 
 void CSqueak::Spawn()
 {
+#ifndef CLIENT_DLL
+	LoadWeaponScript("scripts/weapon_snark.txt");
+#endif
 	Precache();
 	m_iId = WEAPON_SNARK;
 	SET_MODEL( ENT( pev ), "models/w_sqknest.mdl" );

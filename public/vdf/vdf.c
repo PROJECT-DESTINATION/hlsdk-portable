@@ -168,8 +168,6 @@ struct vdf_object* vdf_parse_buffer(const char* buffer, size_t size)
                     {
                         case VDF_TYPE_INT:
                             o->data.data_int = strtol(buf, NULL, 10);
-                            break;
-
                         case VDF_TYPE_STRING:
                             o->data.data_string.len = len;
                             o->data.data_string.str = local_strndup_escape(buf, len);
@@ -346,8 +344,6 @@ struct vdf_object* vdf_object_index_array_str(const struct vdf_object* o, const 
 
 const char* vdf_object_get_string(const struct vdf_object* o)
 {
-    assert(o->type == VDF_TYPE_STRING);
-
     return o->data.data_string.str;
 }
 

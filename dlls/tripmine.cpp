@@ -374,6 +374,9 @@ LINK_ENTITY_TO_CLASS( weapon_tripmine, CTripmine )
 
 void CTripmine::Spawn()
 {
+#ifndef CLIENT_DLL
+	LoadWeaponScript("scripts/weapon_tripmine.txt");
+#endif
 	Precache();
 	m_iId = WEAPON_TRIPMINE;
 	SET_MODEL( ENT( pev ), "models/v_tripmine.mdl" );

@@ -44,6 +44,9 @@ LINK_ENTITY_TO_CLASS( weapon_shotgun, CShotgun )
 
 void CShotgun::Spawn()
 {
+#ifndef CLIENT_DLL
+	LoadWeaponScript("scripts/weapon_shotgun.txt");
+#endif
 	Precache();
 	m_iId = WEAPON_SHOTGUN;
 	SET_MODEL( ENT( pev ), "models/w_shotgun.mdl" );

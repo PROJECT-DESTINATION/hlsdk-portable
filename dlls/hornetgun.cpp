@@ -49,6 +49,9 @@ BOOL CHgun::IsUseable( void )
 
 void CHgun::Spawn()
 {
+#ifndef CLIENT_DLL
+	LoadWeaponScript("scripts/weapon_hgun.txt");
+#endif
 	Precache();
 	m_iId = WEAPON_HORNETGUN;
 	SET_MODEL( ENT( pev ), "models/w_hgun.mdl" );

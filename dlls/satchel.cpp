@@ -229,6 +229,9 @@ int CSatchel::AddToPlayer( CBasePlayer *pPlayer )
 
 void CSatchel::Spawn()
 {
+#ifndef CLIENT_DLL
+	LoadWeaponScript("scripts/weapon_satchel.txt");
+#endif
 	Precache();
 	m_iId = WEAPON_SATCHEL;
 	SET_MODEL( ENT( pev ), "models/w_satchel.mdl" );

@@ -47,6 +47,9 @@ int CMP5::SecondaryAmmoIndex( void )
 
 void CMP5::Spawn()
 {
+#ifndef CLIENT_DLL
+	LoadWeaponScript("scripts/weapon_mp5.txt");
+#endif
 	pev->classname = MAKE_STRING( "weapon_9mmAR" ); // hack to allow for old names
 	Precache();
 	SET_MODEL( ENT( pev ), "models/w_9mmAR.mdl" );
@@ -66,9 +69,6 @@ void CMP5::Spawn()
 
 void CMP5::Precache( void )
 {
-#ifndef CLIENT_DLL
-	LoadWeaponScript("scripts/weapon_mp5.txt");
-#endif
 	PRECACHE_MODEL( "models/v_9mmAR.mdl" );
 	PRECACHE_MODEL( "models/w_9mmAR.mdl" );
 	PRECACHE_MODEL( "models/p_9mmAR.mdl" );

@@ -53,6 +53,9 @@ LINK_ENTITY_TO_CLASS( weapon_egon, CEgon )
 
 void CEgon::Spawn()
 {
+#ifndef CLIENT_DLL
+	LoadWeaponScript("scripts/weapon_egon.txt");
+#endif
 	Precache();
 	m_iId = WEAPON_EGON;
 	SET_MODEL( ENT( pev ), "models/w_egon.mdl" );

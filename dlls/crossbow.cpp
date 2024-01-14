@@ -261,6 +261,9 @@ LINK_ENTITY_TO_CLASS( weapon_crossbow, CCrossbow )
 
 void CCrossbow::Spawn()
 {
+#ifndef CLIENT_DLL
+	LoadWeaponScript("scripts/weapon_crossbow.txt");
+#endif
 	Precache();
 	m_iId = WEAPON_CROSSBOW;
 	SET_MODEL( ENT( pev ), "models/w_crossbow.mdl" );

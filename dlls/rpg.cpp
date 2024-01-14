@@ -323,6 +323,9 @@ void CRpg::Reload( void )
 
 void CRpg::Spawn()
 {
+#ifndef CLIENT_DLL
+	LoadWeaponScript("scripts/weapon_rpg.txt");
+#endif
 	Precache();
 	m_iId = WEAPON_RPG;
 

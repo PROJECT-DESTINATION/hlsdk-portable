@@ -68,6 +68,9 @@ int CPython::AddToPlayer( CBasePlayer *pPlayer )
 
 void CPython::Spawn()
 {
+#ifndef CLIENT_DLL
+	LoadWeaponScript("scripts/weapon_python.txt");
+#endif
 	pev->classname = MAKE_STRING( "weapon_357" ); // hack to allow for old names
 	Precache();
 	m_iId = WEAPON_PYTHON;

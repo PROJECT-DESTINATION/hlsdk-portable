@@ -64,6 +64,9 @@ extern int g_irunninggausspred;
 
 void CGauss::Spawn()
 {
+#ifndef CLIENT_DLL
+	LoadWeaponScript("scripts/weapon_gauss.txt");
+#endif
 	Precache();
 	m_iId = WEAPON_GAUSS;
 	SET_MODEL( ENT( pev ), "models/w_gauss.mdl" );
