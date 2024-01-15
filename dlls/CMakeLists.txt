@@ -59,6 +59,7 @@ set (SVDLL_SOURCES
 	doors.cpp
 	effects.cpp
 	egon.cpp
+	ent_cmd.cpp
 	explode.cpp
 	flyingmonster.cpp
 	func_break.cpp
