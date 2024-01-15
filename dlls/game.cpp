@@ -57,6 +57,8 @@ cvar_t multibyte_only = { "mp_multibyte_only", "0", FCVAR_SERVER };
 
 cvar_t mp_chattime	= { "mp_chattime","10", FCVAR_SERVER };
 
+cvar_t sv_allow_point_servercommand = { "sv_allow_point_servercommand", "0", FCVAR_SERVER };
+
 // Engine Cvars
 cvar_t *g_psv_gravity = NULL;
 cvar_t *g_psv_aim = NULL;
