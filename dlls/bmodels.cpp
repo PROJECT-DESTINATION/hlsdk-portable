@@ -900,3 +900,39 @@ void CPendulum::RopeTouch( CBaseEntity *pOther )
 	pevOther->velocity = g_vecZero;
 	pevOther->movetype = MOVETYPE_NONE;
 }
+
+
+
+/*
+class CFuncTextured : public CBaseEntity
+{
+public:
+	// basic functions
+	void Spawn();
+	void KeyValue(KeyValueData* pkvd);
+
+	char model[128];
+};
+
+LINK_ENTITY_TO_CLASS(func_textured, CFuncTextured)
+
+void CFuncTextured::Spawn()
+{
+	UTIL_SetOrigin(pev, pev->origin);
+	pev->solid = SOLID_BSP;
+	pev->movetype = MOVETYPE_PUSH;
+	SET_MODEL(ENT(pev), STRING(pev->model));
+	g_engfuncs.pfnChangeTexturesInModel(pev->modelindex, model);
+}
+
+void CFuncTextured::KeyValue(KeyValueData* pkvd)
+{
+	if (FStrEq(pkvd->szKeyName, "texture"))
+	{
+		strncpy(model, pkvd->szValue, sizeof(model));
+		pkvd->fHandled = TRUE;
+	}
+	else
+		CBaseEntity::KeyValue(pkvd);
+}
+*/

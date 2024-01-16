@@ -76,4 +76,13 @@ typedef struct mip_s
 	unsigned int	offsets[4];	// four mip maps stored
 } mip_t;
 
+typedef struct mip2_s
+{
+	char		nul;
+	char		name[256];
+	unsigned int	width;
+	unsigned int	height;
+	unsigned int	offsets[4];	// four mip maps stored
+} mip2_t;
+
 #endif//WADFILE_H

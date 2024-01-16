@@ -87,7 +87,7 @@ typedef struct
 
 typedef struct texture_s
 {
-	char		name[16];
+	char		name[256];
 	unsigned	width, height;
 	int			anim_total;				// total tenths in sequence ( 0 = no)
 	int			anim_min, anim_max;		// time for this frame min <=time< max
