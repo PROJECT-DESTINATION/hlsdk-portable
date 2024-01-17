@@ -60,7 +60,7 @@ DEFINES = [
 'XASH_WIN32',
 'XASH_X86',
 'XASH_NSWITCH',
-'XASH_PSVITA',
+'XASH_PSVITA'
 ]
 
 def configure(conf):

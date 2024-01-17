@@ -7,7 +7,11 @@
 
 // Client side entity management functions
 
+#if __ps3__
+#include <memory>
+#else
 #include <memory.h>
+#endif
 
 #include "hud.h"
 #include "cl_util.h"

@@ -66,8 +66,10 @@ typedef int BOOL;
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
-#if HAVE_CMATH
+#if HAVE_CMATH 
 #include <cmath>
+#elif XASH_PS3
+#include <math.h>
 #else
 #include <math.h>
 #endif

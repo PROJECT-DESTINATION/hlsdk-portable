@@ -502,7 +502,7 @@ class PSVita:
 
 class PS3:
 	ctx			= None # waf context
-	arch		= 'SNC'
+	arch		= 'ppc'
 	ps3sdk_dir	= None
 
 	def __init__(self, ctx):
@@ -543,28 +543,31 @@ class PS3:
 	def cflags(self, cxx = False):
 		cflags = []
 		# arch flags
-		cflags += ['-D__ps3__']#, '-mtune=cellbe'] #, '-mfpu=neon']
+		cflags += ['-c', '-D__ps3__']#, '-mtune=cellppu'] #, '-mfpu=neon']
+		cflags += ['-Xc-=rtti']
 		# necessary linker flags
 		#cflags += ['-Wl,-q', '-Wl,-z']#,nocopyreloc']
 		# this optimization is broken in ps3sdk
-		cflags += ['-fno-optimize-sibling-calls']
+		#cflags += ['-fno-optimize-sibling-calls']
 		# disable some ARM bullshit
-		cflags += ['-fno-short-enums']#, '-Wno-attributes']
+		#cflags += ['-fno-short-enums']#, '-Wno-attributes']
 		# base include dir
-		cflags += ['-isystem %s\\target\\ppu\\include' % self.ps3sdk_dir]
+		#cflags += ['-isystem %s\\target\\ppu\\include' % self.ps3sdk_dir]
 		cflags += ['-I%s\\target\\ppu\\include' % self.ps3sdk_dir]
-		cflags += ['-Ilibsn.a;libm.a;libio_stub.a;libfs_stub.a;$(SCE_PS3_ROOT)\target\ppu\lib\libdbg_libio_stub.a;$(SCE_PS3_ROOT)\target\ppu\lib\libc_stub.a;$(SCE_PS3_ROOT)\target\ppu\lib\libm.a;$(SCE_PS3_ROOT)\target\ppu\lib\libsysutil_np_trophy_stub.a;$(SCE_PS3_ROOT)\target\ppu\lib\libio_stub.a;$(SCE_PS3_ROOT)\target\ppu\lib\libsysutil_stub.a;$(SCE_PS3_ROOT)\target\ppu\lib\libsysmodule_stub.a;$(SCE_PS3_ROOT)\target\ppu\lib\libsyscall.a;$(SCE_PS3_ROOT)\target\ppu\lib\libgcm_sys_stub.a;$(SCE_PS3_ROOT)\host-win32\spu\lib\gcc\spu-lv2\4.1.1\libgcc.a;$(SCE_PS3_ROOT)\target\ppu\lib\libpadfilter.a;$(SCE_PS3_ROOT)\target\ppu\lib\libstdc++.a;$(SCE_PS3_ROOT)\host-win32\ppu\lib\gcc\ppu-lv2\4.1.1\libsupc++.a;$(SCE_PS3_ROOT)\target\ppu\lib\libsysutil_oskdialog_ext_stub.a;$(SCE_PS3_ROOT)\target\ppu\lib\libnet_stub.a'.replace("$(SCE_PS3_ROOT)", self.ps3sdk_dir)]
+		#cflags += ['-Ilibsn.a;libm.a;libio_stub.a;libfs_stub.a;$(SCE_PS3_ROOT)\target\ppu\lib\libdbg_libio_stub.a;$(SCE_PS3_ROOT)\target\ppu\lib\libc_stub.a;$(SCE_PS3_ROOT)\target\ppu\lib\libm.a;$(SCE_PS3_ROOT)\target\ppu\lib\libsysutil_np_trophy_stub.a;$(SCE_PS3_ROOT)\target\ppu\lib\libio_stub.a;$(SCE_PS3_ROOT)\target\ppu\lib\libsysutil_stub.a;$(SCE_PS3_ROOT)\target\ppu\lib\libsysmodule_stub.a;$(SCE_PS3_ROOT)\target\ppu\lib\libsyscall.a;$(SCE_PS3_ROOT)\target\ppu\lib\libgcm_sys_stub.a;$(SCE_PS3_ROOT)\host-win32\spu\lib\gcc\spu-lv2\4.1.1\libgcc.a;$(SCE_PS3_ROOT)\target\ppu\lib\libpadfilter.a;$(SCE_PS3_ROOT)\target\ppu\lib\libstdc++.a;$(SCE_PS3_ROOT)\host-win32\ppu\lib\gcc\ppu-lv2\4.1.1\libsupc++.a;$(SCE_PS3_ROOT)\target\ppu\lib\libsysutil_oskdialog_ext_stub.a;$(SCE_PS3_ROOT)\target\ppu\lib\libnet_stub.a'.replace("$(SCE_PS3_ROOT)", self.ps3sdk_dir)]
 		# SDL include dir
 		#cflags += ['-I%s/ppu-lv2/include/SDL2' % self.ps3sdk_dir]
 		if cxx == True:
 			cflags += ['-Xstd=cpp11']
+		cflags += ['-Xmserrors']
 		return cflags
 
 	# they go before object list
 	def linkflags(self):
-		linkflags = ['-Wl,--hash-style=sysv', '-Wl,-q', '-Wl,-z']#,nocopyreloc']#, '-mtune=cortex-a9', '-mfpu=neon']
+		#linkflags = ['-Wl,--hash-style=sysv', '-Wl,-q', '-Wl,-z']#,nocopyreloc']#, '-mtune=cortex-a9', '-mfpu=neon']
 		# enforce no-short-enums again
-		linkflags += ['-Wl,-no-enum-size-warning', '-fno-short-enums']
+		#linkflags += ['-Wl,-no-enum-size-warning', '-fno-short-enums']
+		linkflags = ['--oformat=elf', '-dc', '-r']
 		return linkflags
 
 	def ldflags(self):
@@ -680,8 +683,8 @@ def configure(conf):
 		conf.env.LIB_M = ['m']
 		conf.env.VRTLD = ['vrtld']
 		conf.env.DEST_OS = 'ps3'
-		conf.env.COMPILER_CXX = 'g++'
-		conf.env.COMPILER_CC = 'gcc'
+		conf.env.COMPILER_CXX = 'snc'
+		conf.env.COMPILER_CC = 'snc'
 
 	conf.env.MAGX = conf.options.MAGX
 	conf.env.MSVC_WINE = conf.options.MSVC_WINE

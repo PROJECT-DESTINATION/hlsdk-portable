@@ -28,7 +28,7 @@ def build(bld):
 	defines = []
 	if bld.env.USE_VOICEMGR:
 		source += bld.path.parent.ant_glob('game_shared/voice_gamemgr.cpp')
-	else:
+	else: 
 		defines += ['NO_VOICEGAMEMGR']
 
 	includes = [

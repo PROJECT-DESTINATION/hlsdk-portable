@@ -89,8 +89,8 @@ def configure(conf):
 		conf.env.append_unique('LINKFLAGS_cxxshlib', ['-nostdlib', '-Wl,--unresolved-symbols=ignore-all'])
 		# same on the vita
 	elif conf.env.DEST_OS == 'ps3':
-		conf.env.append_unique('CFLAGS_cshlib', ['-fPIC'])
-		conf.env.append_unique('CXXFLAGS_cxxshlib', ['-fPIC', '-fno-use-cxa-atexit'])
+		#conf.env.append_unique('CFLAGS_cshlib', ['-fPIC'])
+		#conf.env.append_unique('CXXFLAGS_cxxshlib', ['-fPIC', '-fno-use-cxa-atexit'])
 		conf.env.append_unique('LINKFLAGS_cshlib', ['-nostdlib', '-Wl,--unresolved-symbols=ignore-all'])
 		conf.env.append_unique('LINKFLAGS_cxxshlib', ['-nostdlib', '-Wl,--unresolved-symbols=ignore-all'])
 	# check if we need to use irix linkflags
@@ -199,7 +199,8 @@ def configure(conf):
 	cmath_usable = conf.check_cxx(fragment='''#include<cmath>
 			int main(void){ return (int)sqrt(2.0f); }''',
 			msg='Checking if cmath is usable', mandatory = False)
-	conf.define_cond('HAVE_CMATH', cmath_usable)
+	if conf.env.DEST_OS != "ps3":
+		conf.define_cond('HAVE_CMATH', cmath_usable)
 
 	if conf.env.COMPILER_CC == 'msvc':
 		conf.define('_CRT_SECURE_NO_WARNINGS', True)
@@ -209,7 +210,7 @@ def configure(conf):
 	else:
 		if not conf.env.DEST_OS == "ps3": 
 			conf.env.append_unique('CXXFLAGS', ['-Wno-invalid-offsetof'])
-		conf.env.append_unique('CXXFLAGS', ['-fno-exceptions'])
+			conf.env.append_unique('CXXFLAGS', ['-fno-exceptions'])
 		conf.define('stricmp', 'strcasecmp', quote=False)
 		conf.define('strnicmp', 'strncasecmp', quote=False)
 		conf.define('_snprintf', 'snprintf', quote=False)

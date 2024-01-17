@@ -17,10 +17,6 @@ cmake_install.cmake
 *.vsxproj
 *.vsproj
 *.sln
-.waf-*
-waf-*
-.waf3-*
-waf3-*
 .lock*
 *.pyc
 .vscode/
@@ -42,3 +38,8 @@ local.properties
 
 .depproj/*
 *.lastbuildstate
+
+waf-*/waflib/__pycache__/*
+.waf-*/waflib/__pycache__/*
+waf3-*/waflib/__pycache__/*
+.waf3-*/waflib/__pycache__/*
