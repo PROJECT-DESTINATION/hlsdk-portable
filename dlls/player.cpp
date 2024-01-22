@@ -185,6 +185,12 @@ int gmsgTeamNames = 0;
 int gmsgStatusText = 0;
 int gmsgStatusValue = 0;
 
+int gmsgNotification = 0;
+
+
+
+
+
 void LinkUserMessages( void )
 {
 	// Already taken care of?
@@ -230,6 +236,8 @@ void LinkUserMessages( void )
 
 	gmsgStatusText = REG_USER_MSG( "StatusText", -1 );
 	gmsgStatusValue = REG_USER_MSG( "StatusValue", 3 );
+
+	gmsgNotification = REG_USER_MSG( "Notification", -1 );
 }
 
 LINK_ENTITY_TO_CLASS( player, CBasePlayer )

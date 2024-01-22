@@ -336,6 +336,7 @@ public:
 #define AUTOAIM_10DEGREES 0.1736481776669
 
 extern int gmsgHudText;
+extern int gmsgNotification;
 extern BOOL gInitHUD;
 
 #endif // PLAYER_H

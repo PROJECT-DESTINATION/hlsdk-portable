@@ -142,6 +142,8 @@ inline void CenterPrint( const char *string )
 	gEngfuncs.pfnCenterPrint( string );
 }
 
+
+
 // returns the players name of entity no.
 #define GetPlayerInfo ( *gEngfuncs.pfnGetPlayerInfo )
 

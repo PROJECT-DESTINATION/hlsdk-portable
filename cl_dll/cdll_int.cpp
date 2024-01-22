@@ -195,6 +195,13 @@ void CL_Status_f(void)
 }
 
 
+int __MsgFunc_Notification(const char* pszName, int iSize, void* pbuf)
+{
+	BEGIN_READ(pbuf, iSize);
+	gEngfuncs.Warning(READ_STRING());
+	return 1;
+}
+
 
 int DLLEXPORT Initialize( cl_enginefunc_t *pEnginefuncs, int iVersion )
 {
@@ -218,6 +225,7 @@ int DLLEXPORT Initialize( cl_enginefunc_t *pEnginefuncs, int iVersion )
 	EV_HookEvents();
 
 	gEngfuncs.pfnAddCommand("status", CL_Status_f);
+	HOOK_MESSAGE(Notification);
 
 	return 1;
 }

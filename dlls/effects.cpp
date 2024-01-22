@@ -2233,3 +2233,46 @@ void CItemSoda::CanTouch( CBaseEntity *pOther )
 	SetThink( &CBaseEntity::SUB_Remove );
 	pev->nextthink = gpGlobals->time;
 }
+
+
+
+
+class CNotification : public CPointEntity
+{
+public:
+	void Spawn(void);
+	void Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value);
+private:
+};
+
+LINK_ENTITY_TO_CLASS(env_notification, CNotification)
+
+void CNotification::Spawn(void)
+{
+	pev->solid = SOLID_NOT;
+	pev->movetype = MOVETYPE_NONE;
+}
+
+
+void CNotification::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
+{
+	CBaseEntity* pPlayer = NULL;
+
+	if (pev->spawnflags & SF_MESSAGE_ALL)
+		UTIL_ShowNotificationAll(STRING(pev->message));
+	else
+	{
+		if (pActivator && pActivator->IsPlayer())
+			pPlayer = pActivator;
+		else
+			pPlayer = CBaseEntity::Instance(g_engfuncs.pfnPEntityOfEntIndex(1));
+
+		if (pPlayer)
+			UTIL_ShowNotification(STRING(pev->message), pPlayer);
+	}
+
+	if (pev->spawnflags & SF_MESSAGE_ONCE)
+		UTIL_Remove(this);
+
+	SUB_UseTargets(this, USE_TOGGLE, 0);
+}

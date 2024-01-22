@@ -265,6 +265,8 @@ extern void			UTIL_ScreenShake		( const Vector &center, float amplitude, float f
 extern void			UTIL_ScreenShakeAll		( const Vector &center, float amplitude, float frequency, float duration );
 extern void			UTIL_ShowMessage		( const char *pString, CBaseEntity *pPlayer );
 extern void			UTIL_ShowMessageAll		( const char *pString );
+extern void			UTIL_ShowNotification	( const char* pString, CBaseEntity* pPlayer );
+extern void			UTIL_ShowNotificationAll( const char* pString );
 extern void			UTIL_ScreenFadeAll		( const Vector &color, float fadeTime, float holdTime, int alpha, int flags );
 extern void			UTIL_ScreenFade			( CBaseEntity *pEntity, const Vector &color, float fadeTime, float fadeHold, int alpha, int flags );
 

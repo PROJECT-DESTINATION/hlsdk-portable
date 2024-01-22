@@ -899,6 +899,16 @@ void UTIL_ShowMessage( const char *pString, CBaseEntity *pEntity )
 	MESSAGE_END();
 }
 
+void UTIL_ShowNotification(const char* pString, CBaseEntity* pEntity)
+{
+	if (!pEntity || !pEntity->IsNetClient())
+		return;
+
+	MESSAGE_BEGIN(MSG_ONE, gmsgNotification, NULL, pEntity->edict());
+	WRITE_STRING(pString);
+	MESSAGE_END();
+}
+
 void UTIL_ShowMessageAll( const char *pString )
 {
 	int i;
@@ -909,6 +919,19 @@ void UTIL_ShowMessageAll( const char *pString )
 		CBaseEntity *pPlayer = UTIL_PlayerByIndex( i );
 		if( pPlayer )
 			UTIL_ShowMessage( pString, pPlayer );
+	}
+}
+
+void UTIL_ShowNotificationAll(const char* pString)
+{
+	int i;
+
+	// loop through all players
+	for (i = 1; i <= gpGlobals->maxClients; i++)
+	{
+		CBaseEntity* pPlayer = UTIL_PlayerByIndex(i);
+		if (pPlayer)
+			UTIL_ShowNotification(pString, pPlayer);
 	}
 }
 
