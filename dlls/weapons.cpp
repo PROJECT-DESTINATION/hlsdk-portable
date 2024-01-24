@@ -1262,6 +1262,7 @@ bool CBasePlayerWeapon::LoadWeaponScript(const char* path)
 		map_set(weaponscripts, path, script);
 	}
 	strncpy(m_sWeaponscript, path, 128);
+	return true;
 }
 
 //*********************************************************
