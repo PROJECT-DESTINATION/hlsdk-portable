@@ -896,3 +896,21 @@ void GameDLLInit( void )
 	SERVER_COMMAND( "exec skill.cfg\n" );
 }
 
+#if __PS3__
+#include <cellstatus.h>
+#include <sys/prx.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+SYS_LIB_DECLARE(game, SYS_LIB_AUTO_EXPORT);
+SYS_LIB_EXPORT(_game_export_function, game);
+
+SYS_MODULE_INFO(game, 0, 1, 0);
+
+
+extern "C" int _game_export_function(void)
+{
+	return CELL_OK;
+}
+
+#endif

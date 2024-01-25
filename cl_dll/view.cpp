@@ -411,7 +411,7 @@ V_CalcSourceLag
 float g_fMaxViewModelLag = 1.5f;
 void V_CalcSourceLag(struct ref_params_s *pparams)
 {
-	auto view = gEngfuncs.GetViewModel();
+	cl_entity_s* view = gEngfuncs.GetViewModel();
 	static Vector m_vecLast = g_vecZero;
 
 	Vector angles = pparams->cl_viewangles;

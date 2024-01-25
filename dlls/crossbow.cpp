@@ -196,7 +196,6 @@ void CCrossbowBolt::BubbleThink( void )
 
 	if( pev->waterlevel == 0 )
 		return;
-
 	UTIL_BubbleTrail( pev->origin - pev->velocity * 0.1f, pev->origin, 1 );
 }
 

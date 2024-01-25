@@ -1470,7 +1470,9 @@ void CBaseEntity::FireBullets( ULONG cShots, Vector vecSrc, Vector vecDirShootin
 			}
 		}
 		// make bullet trails
+#ifndef CLIENT_DLL
 		UTIL_BubbleTrail( vecSrc, tr.vecEndPos, (int)( ( flDistance * tr.flFraction ) / 64.0f ) );
+#endif
 	}
 	ApplyMultiDamage( pev, pevAttacker );
 }
@@ -1555,8 +1557,10 @@ Vector CBaseEntity::FireBulletsPlayer( ULONG cShots, Vector vecSrc, Vector vecDi
 				break;
 			}
 		}
+#ifndef CLIENT_DLL
 		// make bullet trails
 		UTIL_BubbleTrail( vecSrc, tr.vecEndPos, (int)( ( flDistance * tr.flFraction ) / 64.0f ) );
+#endif
 	}
 	ApplyMultiDamage( pev, pevAttacker );
 

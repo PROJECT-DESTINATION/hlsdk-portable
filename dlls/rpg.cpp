@@ -245,6 +245,7 @@ void CRpgRocket::FollowThink( void )
 			{
 				pev->velocity = pev->velocity.Normalize() * 300.0f;
 			}
+			
 			UTIL_BubbleTrail( pev->origin - pev->velocity * 0.1f, pev->origin, 4 );
 		} 
 		else 

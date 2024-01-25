@@ -102,17 +102,31 @@ def build(bld):
 		install_path = os.path.join(bld.env.GAMEDIR, bld.env.CLIENT_INSTALL_DIR)
 	else:
 		install_path = bld.env.PREFIX
-
-	bld.shlib(
-		source   = source,
-		target   = 'client' + bld.env.POSTFIX,
-		name     = 'client',
-		features = 'c cxx',
-		includes = includes,
-		defines  = defines,
-		use      = libs,
-		install_path = install_path,
-		subsystem = bld.env.MSVC_SUBSYSTEM,
-		idx = bld.get_taskgen_count()
-	)
+	
+	if bld.env.PS3:
+		bld(
+			source   = source,
+			target   = 'client' + bld.env.POSTFIX,
+			name     = 'client',
+			features = 'c_ps3 cxx_ps3 cxxshlib_ps3',
+			includes = includes,
+			defines  = defines,
+			use      = libs,
+			install_path = install_path,
+			subsystem = bld.env.MSVC_SUBSYSTEM,
+			idx = bld.get_taskgen_count()
+		)
+	else:
+		bld.shlib(
+			source   = source,
+			target   = 'client' + bld.env.POSTFIX,
+			name     = 'client',
+			features = 'c cxx',
+			includes = includes,
+			defines  = defines,
+			use      = libs,
+			install_path = install_path,
+			subsystem = bld.env.MSVC_SUBSYSTEM,
+			idx = bld.get_taskgen_count()
+		)
 

@@ -49,7 +49,7 @@ def build(bld):
 		source   = source,
 		target   = bld.env.SERVER_LIBRARY_NAME + bld.env.POSTFIX,
 		name     = 'server',
-		features = 'c cxx',
+		features = 'c_ps3 cxx_ps3',
 		includes = includes,
 		defines  = defines,
 		install_path = install_path,

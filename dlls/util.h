@@ -28,7 +28,7 @@
 
 #include <string.h>
 #include <ctype.h>
-#include <unordered_map>
+
 inline void MESSAGE_BEGIN( int msg_dest, int msg_type, const float *pOrigin, entvars_t *ent );  // implementation later in this file
 
 extern globalvars_t				*gpGlobals;
@@ -329,6 +329,7 @@ extern float		UTIL_SplineFraction( float value, float scale );
 // Search for water transition along a vertical line
 extern float		UTIL_WaterLevel( const Vector &position, float minz, float maxz );
 extern void			UTIL_Bubbles( Vector mins, Vector maxs, int count );
+
 extern void			UTIL_BubbleTrail( Vector from, Vector to, int count );
 
 // allows precacheing of other entities

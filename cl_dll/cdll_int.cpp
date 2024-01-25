@@ -472,3 +472,22 @@ bool IsXashFWGS()
 {
 	return gMobileEngfuncs != NULL;
 }
+
+#if __PS3__
+#include <cellstatus.h>
+#include <sys/prx.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+SYS_LIB_DECLARE(cl, SYS_LIB_AUTO_EXPORT);
+SYS_LIB_EXPORT(_cl_export_function, cl);
+
+SYS_MODULE_INFO(cl, 0, 1, 0);
+
+
+extern "C" int _cl_export_function(void)
+{
+	return CELL_OK;
+}
+
+#endif

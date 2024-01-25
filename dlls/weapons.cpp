@@ -1246,6 +1246,7 @@ float CBasePlayerWeapon::GetNextAttackDelay( float delay )
 	//OutputDebugString( szMsg );
 	return flNextAttack;
 }
+#ifndef CLIENT_DLL
 
 bool CBasePlayerWeapon::LoadWeaponScript(const char* path)
 {
@@ -1264,7 +1265,7 @@ bool CBasePlayerWeapon::LoadWeaponScript(const char* path)
 	strncpy(m_sWeaponscript, path, 128);
 	return true;
 }
-
+#endif
 //*********************************************************
 // weaponbox code:
 //*********************************************************

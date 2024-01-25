@@ -135,3 +135,8 @@ HSPRITE LoadSprite( const char *pszName )
 
 	return SPR_Load( sz );
 }
+
+void UTIL_BubbleTrail(Vector from, Vector to, int count)
+{
+
+}
