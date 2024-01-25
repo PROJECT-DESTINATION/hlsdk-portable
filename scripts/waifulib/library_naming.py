@@ -19,6 +19,36 @@ int main(int argc, char** argv)
 }
 '''
 
+CHECK_SYMBOL_EXISTS_FRAGMENT_PS3 = '''
+#include "build.h"
+#include <cellstatus.h>
+#include <sys/prx.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+SYS_LIB_DECLARE(test, SYS_LIB_AUTO_EXPORT);
+SYS_LIB_EXPORT(_test_export_function, test);
+
+SYS_MODULE_INFO(test, 0, 1, 0);
+
+
+extern "C" int _test_export_function(void)
+{
+	return CELL_OK;
+}
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef %s
+  return ((int*)(&%s))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+'''
+
 # generated(see comments in public/build.h)
 # cat build.h | grep '^#undef XASH' | awk '{ print "'\''" $2 "'\''," }'
 DEFINES = [
@@ -61,15 +91,22 @@ DEFINES = [
 'XASH_X86',
 'XASH_NSWITCH',
 'XASH_PSVITA',
+'XASH_PS3',
 ]
 
 def configure(conf):
 	conf.env.stash()
 	conf.start_msg('Determining library postfix')
-	tests = map(lambda x: {
-		'fragment': CHECK_SYMBOL_EXISTS_FRAGMENT % (x, x),
-		'includes': [conf.path.find_node('public/').abspath()],
-		'define_name': x }, DEFINES )
+	if not conf.env.PS3:
+		tests = map(lambda x: {
+			'fragment': CHECK_SYMBOL_EXISTS_FRAGMENT % (x, x),
+			'includes': [conf.path.find_node('public/').abspath()],
+			'define_name': x }, DEFINES )
+	else:
+		tests = map(lambda x: {
+			'fragment': CHECK_SYMBOL_EXISTS_FRAGMENT_PS3 % (x, x),
+			'includes': [conf.path.find_node('public/').abspath()],
+			'define_name': x }, DEFINES )
 
 	conf.multicheck(*tests, msg = '', mandatory = False, quiet = True)
 
@@ -100,6 +137,8 @@ def configure(conf):
 		buildos = "psvita"
 	elif conf.env.XASH_IRIX:
 		buildos = "irix"
+	elif conf.env.XASH_PS3:
+		buildos = "ps3"
 	else:
 		conf.fatal("Place your operating system name in build.h and library_naming.py!\n"
 			"If this is a mistake, try to fix conditions above and report a bug")

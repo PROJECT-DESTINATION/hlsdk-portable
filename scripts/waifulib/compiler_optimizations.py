@@ -30,7 +30,7 @@ compiler_optimizations.CFLAGS['gottagofast'] = {
 }
 '''
 
-VALID_BUILD_TYPES = ['fastnative', 'fast', 'release', 'debug', 'sanitize', 'msan', 'none']
+VALID_BUILD_TYPES = ['fastnative', 'fast', 'release', 'debug', 'sanitize', 'msan', 'none' , 'ps3']
 
 LINKFLAGS = {
 	'common': {
@@ -49,6 +49,9 @@ LINKFLAGS = {
 	},
 	'debug': {
 		'msvc': ['/INCREMENTAL', '/SAFESEH:NO']
+	},
+	'ps3': {
+		'gcc':     ['-O2']
 	}
 }
 
@@ -74,6 +77,9 @@ CFLAGS = {
 		'gcc':     ['-Ofast', '-march=native', '-funsafe-math-optimizations', '-funsafe-loop-optimizations', '-fomit-frame-pointer'],
 		'clang':   ['-Ofast', '-march=native'],
 		'default': ['-O3']
+	},
+	'ps3': {
+		'gcc':     ['-O2']
 	},
 	'release': {
 		'msvc':    ['/O2', '/Zi'],

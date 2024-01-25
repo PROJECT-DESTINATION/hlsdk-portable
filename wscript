@@ -54,6 +54,9 @@ def configure(conf):
 
 	if conf.env.COMPILER_CC == 'msvc':
 		conf.load('msvc_pdb')
+	
+	if conf.options.PS3:
+		conf.load('ps3')
 
 	conf.load('msvs msdev subproject clang_compilation_database strip_on_install enforce_pic')
 
@@ -95,8 +98,11 @@ def configure(conf):
 		if 'sgug' in os.environ['LD_LIBRARYN32_PATH']:
 			linkflags.append('-lc')
 
-	conf.check_cc(cflags=cflags, linkflags=linkflags, msg='Checking for required C flags')
-	conf.check_cxx(cxxflags=cxxflags, linkflags=linkflags, msg='Checking for required C++ flags')
+	if conf.env.DEST_OS != "ps3":
+		conf.check_cc(cflags=cflags, linkflags=linkflags, msg='Checking for required C flags')
+		conf.check_cxx(cxxflags=cxxflags, linkflags=linkflags, msg='Checking for required C++ flags')
+	else:
+		linkflags.remove('-Wl,--no-undefined')
 
 	conf.env.append_unique('CFLAGS', cflags)
 	conf.env.append_unique('CXXFLAGS', cxxflags)
@@ -174,6 +180,8 @@ def configure(conf):
 		else:
 			for i in a:
 				conf.check_cc(lib = i)
+	elif conf.env.DEST_OS == 'ps3':
+		pass
 	else:
 		if conf.env.GOLDSOURCE_SUPPORT:
 			conf.check_cc(lib='dl')
