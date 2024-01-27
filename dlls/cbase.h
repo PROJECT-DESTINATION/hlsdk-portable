@@ -74,6 +74,9 @@ extern void SaveGlobalState( SAVERESTOREDATA *pSaveData );
 extern void RestoreGlobalState( SAVERESTOREDATA *pSaveData );
 extern void ResetGlobalState( void );
 
+#include "map/map.h"
+
+extern map_void_t exports;
 typedef enum
 {
 	USE_OFF = 0,

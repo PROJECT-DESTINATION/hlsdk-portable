@@ -108,9 +108,23 @@ typedef int BOOL;
 #if CLIENT_DLL
 #define LINK_ENTITY_TO_CLASS(mapClassName,DLLClassName)
 #else // CLIENT_DLL
+#ifdef XASH_PS3
+#define LINK_ENTITY_TO_CLASS(mapClassName,DLLClassName) void mapClassName(entvars_t* pev)\
+{\
+	GetClassPtr((DLLClassName*)pev);\
+}\
+class PS3Export_##mapClassName \
+{\
+public:\
+	PS3Export_##mapClassName()\
+	{\
+		map_set(&exports,#mapClassName,mapClassName);\
+	}\
+};
+#else
 #define LINK_ENTITY_TO_CLASS(mapClassName,DLLClassName) extern "C" EXPORT void mapClassName( entvars_t *pev ); void mapClassName( entvars_t *pev ) { GetClassPtr( (DLLClassName *)pev ); }
+#endif
 #endif // CLIENT_DLL
-
 //
 // Conversion among the three types of "entity", including identity-conversions.
 //

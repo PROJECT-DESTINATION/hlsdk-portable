@@ -167,6 +167,13 @@ void PM_SortTextures( void )
 	}
 }
 
+
+#if __PS3__
+#define isspace(c) ((c) == ' ')
+#define isalpha(c) (((c) >= 'a' && (c) <= 'z') || ((c) >= 'A' && (c) <= 'Z'))
+#define toupper(c) (((c) >= 'a' && (c) <= 'z') ? (c) - ('a'-'A') : (c))
+#endif
+
 void PM_InitTextureTypes()
 {
 	char buffer[512];
@@ -192,40 +199,42 @@ void PM_InitTextureTypes()
 	// for each line in the file...
 	while( pmove->memfgets( pMemFile, fileSize, &filePos, buffer, 511 ) != NULL && (gcTextures < CTEXTURESMAX ) )
 	{
+		pmove->Con_Printf("PM_InitTextureTypes %i\n", __LINE__);
 		// skip whitespace
 		i = 0;
 		while( buffer[i] && isspace( buffer[i] ) )
 			i++;
-
+		pmove->Con_Printf("PM_InitTextureTypes %i\n", __LINE__);
 		if( !buffer[i] )
 			continue;
-
+		pmove->Con_Printf("PM_InitTextureTypes %i\n", __LINE__);
 		// skip comment lines
 		if( buffer[i] == '/' || !isalpha( buffer[i] ) )
 			continue;
-
+		pmove->Con_Printf("PM_InitTextureTypes %i\n", __LINE__);
 		// get texture type
 		grgchTextureType[gcTextures] = toupper( buffer[i++] );
-
+		pmove->Con_Printf("PM_InitTextureTypes %i\n", __LINE__);
 		// skip whitespace
 		while( buffer[i] && isspace( buffer[i] ) )
 			i++;
-		
+		pmove->Con_Printf("PM_InitTextureTypes %i\n", __LINE__);
 		if( !buffer[i] )
 			continue;
-
+		pmove->Con_Printf("PM_InitTextureTypes %i\n", __LINE__);
 		// get sentence name
 		j = i;
 		while( buffer[j] && !isspace( buffer[j] ) )
 			j++;
-
+		pmove->Con_Printf("PM_InitTextureTypes %i\n", __LINE__);
 		if( !buffer[j] )
 			continue;
-
+		pmove->Con_Printf("PM_InitTextureTypes %i\n", __LINE__);
 		// null-terminate name and save in sentences array
 		j = min( j, CBTEXTURENAMEMAX - 1 + i );
 		buffer[j] = 0;
 		strcpy( &( grgszTextureName[gcTextures++][0] ), &( buffer[i] ) );
+		pmove->Con_Printf("PM_InitTextureTypes %i\n", __LINE__);
 	}
 
 	// Must use engine to free since we are in a .dll

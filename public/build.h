@@ -137,6 +137,7 @@ Then you can use another oneliner to query all variables:
 		#define XASH_PSVITA 1
 	#elif defined __PS3__
 		#define XASH_PS3 1
+		#define NO_VOICEGAMEMGR 1
 	#else
 		#error
 	#endif

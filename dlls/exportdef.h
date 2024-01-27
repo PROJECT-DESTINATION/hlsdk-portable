@@ -8,7 +8,7 @@
 		#define EXPORT __declspec(dllexport) // Note: actually gcc seems to also supports this syntax.
 	#endif
 #else
-	#if __GNUC__ >= 4
+	#if __GNUC__ >= 4 && !defined(__PS3__)
 		#define EXPORT __attribute__ ((visibility ("default")))
 	#else
 		#define EXPORT

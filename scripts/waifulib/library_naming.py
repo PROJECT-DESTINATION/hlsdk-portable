@@ -30,9 +30,10 @@ SYS_LIB_DECLARE(test, SYS_LIB_AUTO_EXPORT);
 SYS_LIB_EXPORT(_test_export_function, test);
 
 SYS_MODULE_INFO(test, 0, 1, 0);
+SYS_MODULE_START(main);
 
 
-extern "C" int _test_export_function(void)
+int _test_export_function(void)
 {
 	return CELL_OK;
 }
@@ -102,13 +103,11 @@ def configure(conf):
 			'fragment': CHECK_SYMBOL_EXISTS_FRAGMENT % (x, x),
 			'includes': [conf.path.find_node('public/').abspath()],
 			'define_name': x }, DEFINES )
+		conf.multicheck(*tests, msg = '', mandatory = False, quiet = True)
 	else:
-		tests = map(lambda x: {
-			'fragment': CHECK_SYMBOL_EXISTS_FRAGMENT_PS3 % (x, x),
-			'includes': [conf.path.find_node('public/').abspath()],
-			'define_name': x }, DEFINES )
-
-	conf.multicheck(*tests, msg = '', mandatory = False, quiet = True)
+		conf.env.XASH_PS3 = True
+		conf.env.XASH_PPC = True
+		conf.env.XASH_64BIT = True
 
 	# engine/common/build.c
 	if conf.env.XASH_ANDROID:

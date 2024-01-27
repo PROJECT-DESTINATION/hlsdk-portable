@@ -101,8 +101,6 @@ def configure(conf):
 	if conf.env.DEST_OS != "ps3":
 		conf.check_cc(cflags=cflags, linkflags=linkflags, msg='Checking for required C flags')
 		conf.check_cxx(cxxflags=cxxflags, linkflags=linkflags, msg='Checking for required C++ flags')
-	else:
-		linkflags.remove('-Wl,--no-undefined')
 
 	conf.env.append_unique('CFLAGS', cflags)
 	conf.env.append_unique('CXXFLAGS', cxxflags)
@@ -181,7 +179,7 @@ def configure(conf):
 			for i in a:
 				conf.check_cc(lib = i)
 	elif conf.env.DEST_OS == 'ps3':
-		pass
+		conf.env.COMPILER_CC = 'snc'
 	else:
 		if conf.env.GOLDSOURCE_SUPPORT:
 			conf.check_cc(lib='dl')
@@ -209,13 +207,14 @@ def configure(conf):
 	elif conf.env.COMPILER_CC == 'owcc':
 		pass
 	else:
-		conf.env.append_unique('CXXFLAGS', ['-Wno-invalid-offsetof', '-fno-exceptions'])
+		if conf.env.COMPILER_CC != 'snc':
+			conf.env.append_unique('CXXFLAGS', ['-Wno-invalid-offsetof', '-fno-exceptions'])
+			conf.define('_LINUX', True)
+			conf.define('LINUX', True)
 		conf.define('stricmp', 'strcasecmp', quote=False)
 		conf.define('strnicmp', 'strncasecmp', quote=False)
 		conf.define('_snprintf', 'snprintf', quote=False)
 		conf.define('_vsnprintf', 'vsnprintf', quote=False)
-		conf.define('_LINUX', True)
-		conf.define('LINUX', True)
 
 	conf.msg(msg='-> processing mod options', result='...', color='BLUE')
 	regex = re.compile('^([A-Za-z0-9_]+)=([A-Za-z0-9_]+)\ \#\ (.*)$')

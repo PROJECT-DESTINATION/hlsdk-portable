@@ -24,7 +24,10 @@ def build(bld):
 
 	source = bld.path.ant_glob('**/*.cpp', excl=excluded_files)
 	source += bld.path.parent.ant_glob(['pm_shared/*.c','public/vdf/*.c','public/map/*.c'])
-
+	
+	
+	
+	
 	defines = []
 	if bld.env.USE_VOICEMGR:
 		source += bld.path.parent.ant_glob('game_shared/voice_gamemgr.cpp')
@@ -39,6 +42,10 @@ def build(bld):
 		'../game_shared',
 		'../public'
 	]
+	
+	if bld.env.DEST_OS == 'ps3':
+		source += ['../ps3/lib.c']
+		includes += ['../ps3']
 
 	if bld.env.DEST_OS not in ['android', 'dos']:
 		install_path = os.path.join(bld.env.GAMEDIR, bld.env.SERVER_INSTALL_DIR)

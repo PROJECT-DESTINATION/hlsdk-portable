@@ -25,6 +25,7 @@
 #define N_SCALE		15
 #define N_SPHERES	20
 
+
 class CNihilanth : public CBaseMonster
 {
 public:

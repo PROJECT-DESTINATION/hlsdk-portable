@@ -901,12 +901,38 @@ void GameDLLInit( void )
 #include <sys/prx.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "map/map.h"
+#include <stdio.h>
+#include "ps3lib.h"
+
+
+map_void_t exports;
+
+ps3std_t* stds;
 
 SYS_LIB_DECLARE(game, SYS_LIB_AUTO_EXPORT);
 SYS_LIB_EXPORT(_game_export_function, game);
 
+extern "C" int GetEntityAPI(DLL_FUNCTIONS* pFunctionTable, int interfaceVersion);
+extern "C" int GetEntityAPI2(DLL_FUNCTIONS* pFunctionTable, int interfaceVersion);
+extern "C" void GiveFnptrsToDll(enginefuncs_t * pengfuncsFromEngine, globalvars_t * pGlobals);
+
+int main(int argc, void* args)
+{
+	stds = ((package_t*)args)->stds;
+	//map_init(&exports); -- should get initialized by entities
+	map_set(&exports, "GetEntityAPI", GetEntityAPI);
+	map_set(&exports, "GetEntityAPI2", GetEntityAPI2);
+	map_set(&exports, "GiveFnptrsToDll", GiveFnptrsToDll);
+	((package_t*)args)->exports = &exports;
+	return 0;
+}
+
 SYS_MODULE_INFO(game, 0, 1, 0);
 
+
+
+SYS_MODULE_START(main);
 
 extern "C" int _game_export_function(void)
 {

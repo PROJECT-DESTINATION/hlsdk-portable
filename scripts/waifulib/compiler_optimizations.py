@@ -79,7 +79,7 @@ CFLAGS = {
 		'default': ['-O3']
 	},
 	'ps3': {
-		'gcc':     ['-O2']
+		'snc':     ['-O2']
 	},
 	'release': {
 		'msvc':    ['/O2', '/Zi'],
