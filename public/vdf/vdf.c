@@ -94,206 +94,249 @@ static void print_escaped(const char* s)
     }
 }
 
+#if XASH_PS3
+#define isdigit(c) ((c) >= '0' && (c) <= '9')
+#define isalpha(c) (((c) >= 'a' && (c) <= 'z') || ((c) >= 'A' && (c) <= 'Z'))
+#endif
+
 struct vdf_object* vdf_parse_buffer(const char* buffer, size_t size)
 {
-    if (!buffer)
-        return NULL;
+	int bleh;
+	if (!buffer)
+		return NULL;
 
-    struct vdf_object* root_object = malloc(sizeof(struct vdf_object));
-    root_object->key = NULL;
-    root_object->parent = NULL;
-    root_object->type = VDF_TYPE_NONE;
-    root_object->conditional = NULL;
+	struct vdf_object* root_object = malloc(sizeof(struct vdf_object));
+	root_object->key = NULL;
+	root_object->parent = NULL;
+	root_object->type = VDF_TYPE_NONE;
+	root_object->conditional = NULL;
 
-    struct vdf_object* o = root_object;
+	struct vdf_object* o = root_object;
 
-    const char* head = buffer;
-    const char* tail = head;
+	const char* head = buffer;
+	const char* tail = head;
 
-    const char* end = buffer + size;
+	const char* end = buffer + size;
 
-    const char* buf = tail;
-
-    size_t chars = 0;
-
-    for (size_t i = 0; buf[i] && buf[i] != CHAR_NEWLINE; ++i)
-    {
-        if (isalpha(buf[i]) || isdigit(buf[i]))
-            chars++;
-    }
-
-    o->key = local_strndup_escape(buf, chars);
-
-    tail += chars;
-
-    buf = 0;
-
-    while (end > tail)
-    {
-        switch (*tail)
-        {
-            case CHAR_DOUBLE_QUOTE:
-                if (tail > buffer && *(tail-1) == CHAR_BACKSLASH)
-                    break;
-
-                if (!buf)
-                {
-                    buf = tail+1;
-                }
-                else if (o->key)
-                {
-                    size_t len = tail - buf;
-                    size_t digits = 0;
-                    size_t chars = 0;
-
-                    for (size_t i = 0; i < len; ++i)
-                    {
-                        if (isdigit(buf[i]))
-                            digits++;
-
-                        if (isalpha(buf[i]))
-                            chars++;
-                    }
-
-                    if (len && digits == len)
-                    {
-                        o->type = VDF_TYPE_INT;
-                    }
-                    else
-                    {
-                        o->type = VDF_TYPE_STRING;
-                    }
-
-                    switch (o->type)
-                    {
-                        case VDF_TYPE_INT:
-                            o->data.data_int = strtol(buf, NULL, 10);
-                        case VDF_TYPE_STRING:
-                            o->data.data_string.len = len;
-                            o->data.data_string.str = local_strndup_escape(buf, len);
-                            break;
-
-                        default:
-                            assert(0);
-                            break;
-                    }
-
-                    buf = NULL;
-
-                    if (o->parent && o->parent->type == VDF_TYPE_ARRAY)
-                    {
-                        o = o->parent;
-                        assert(o->type == VDF_TYPE_ARRAY);
-
-                        o->data.data_array.len++;
-                        o->data.data_array.data_value = realloc(o->data.data_array.data_value, (sizeof(void*)) * (o->data.data_array.len + 1));
-                        o->data.data_array.data_value[o->data.data_array.len] = malloc(sizeof(struct vdf_object)),
-                        o->data.data_array.data_value[o->data.data_array.len]->parent = o;
-
-                        o = o->data.data_array.data_value[o->data.data_array.len];
-                        o->key = NULL;
-                        o->type = VDF_TYPE_NONE;
-                        o->conditional = NULL;
-                    }
-                }
-                else
-                {
-                    size_t len = tail - buf;
-                    o->key = local_strndup_escape(buf, len);
-                    buf = NULL;
-                }
-                break;
-
-            case CHAR_OPEN_CURLY_BRACKET:
-                assert(!buf);
-                assert(o->type == VDF_TYPE_NONE);
-
-                if (o->parent && o->parent->type == VDF_TYPE_ARRAY)
-                    o->parent->data.data_array.len++;
-
-                o->type = VDF_TYPE_ARRAY;
-                o->data.data_array.len = 0;
-                o->data.data_array.data_value = malloc((sizeof(void*)) * (o->data.data_array.len + 1));
-                o->data.data_array.data_value[o->data.data_array.len] = malloc(sizeof(struct vdf_object));
-                o->data.data_array.data_value[o->data.data_array.len]->parent = o;
-
-                o = o->data.data_array.data_value[o->data.data_array.len];
-                o->key = NULL;
-                o->type = VDF_TYPE_NONE;
-                o->conditional = NULL;
-                break;
-
-            case CHAR_CLOSED_CURLY_BRACKET:
-                assert(!buf);
-
-
-                o = o->parent;
-                assert(o);
-                if (o->parent)
-                {
-                    o = o->parent;
-                    assert(o->type == VDF_TYPE_ARRAY);
-
-                    o->data.data_array.data_value = realloc(o->data.data_array.data_value, (sizeof(void*)) * (o->data.data_array.len + 1));
-                    o->data.data_array.data_value[o->data.data_array.len] = malloc(sizeof(struct vdf_object)),
-                    o->data.data_array.data_value[o->data.data_array.len]->parent = o;
-
-                    o = o->data.data_array.data_value[o->data.data_array.len];
-                    o->key = NULL;
-                    o->type = VDF_TYPE_NONE;
-                    o->conditional = NULL;
-                }
+	const char* buf = NULL;
+	char why[2];
+	why[1] = '\n';
+	while (end > tail)
+	{
+		why[0] = *tail;
+		switch (*tail)
+		{
+		case CHAR_NEWLINE:
+		case '\r':
+			if (buf && o->key)
+			{
+				goto EndOfValue;
+			}
+			else
+			{
+				break;
+			}
+		case '.':
+		case '0':
+		case '1':
+		case '2':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
+		case '8':
+		case '9':
+			if (buf)
+				break;
+		case CHAR_DOUBLE_QUOTE:
+			if (tail > buffer && *(tail - 1) == CHAR_BACKSLASH)
+				break;
+			if (!buf)
+			{
+				if ((isdigit((char)(*tail)) || *tail == '.'))
+				{
+					buf = tail;
+				}
 				else
 				{
-					root_object->type = VDF_TYPE_ARRAY;
-					return root_object;
+					buf = tail + 1;
+				}
+			}
+			else if (o->key)
+			{
+			EndOfValue:
+				size_t len = tail - buf;
+				size_t digits = 0;
+				size_t chars = 0;
+				char isfloat = 0;
+
+				for (size_t i = 0; i < len; ++i)
+				{
+					if (isdigit(buf[i]))
+						digits++;
+
+					if (buf[i] == '.')
+					{
+						digits++;
+						isfloat = 1;
+					}
+
+					if (isalpha(buf[i]))
+						chars++;
 				}
 
-                break;
+				if (len && digits == len)
+				{
+					if (isfloat)
+					{
+						o->type = VDF_TYPE_FLOAT;
+					}
+					else
+					{
+						o->type = VDF_TYPE_INT;
 
-            case CHAR_FRONTSLASH:
-                if (!buf)
-                    while (*tail != '\0' && *tail != CHAR_NEWLINE)
-                        ++tail;
+					}
+				}
+				else
+				{
+					o->type = VDF_TYPE_STRING;
+				}
 
-                break;
+				switch (o->type)
+				{
+				case VDF_TYPE_INT:
+					o->data.data_int = strtol(buf, NULL, 10);
+					break;
 
-            case CHAR_OPEN_ANGLED_BRACKET:
-                if (!buf)
-                {
-                    struct vdf_object* prev = o->parent->data.data_array.data_value[o->parent->data.data_array.len-1];
-                    assert(!prev->conditional);
+				case VDF_TYPE_FLOAT:
+					o->data.data_float = strtof(buf, NULL);
+					break;
 
-                    buf = tail+1;
+				case VDF_TYPE_STRING:
+					o->data.data_string.len = len;
+					o->data.data_string.str = local_strndup_escape(buf, len);
+					break;
 
-                    while (*tail != '\0' && *tail != CHAR_CLOSED_ANGLED_BRACKET)
-                        ++tail;
+				default:
+					//assert(0);
+					break;
+				}
 
-                    prev->conditional = local_strndup_escape(buf, tail-buf);
+				buf = NULL;
 
-                    buf = NULL;
-                }
+				if (o->parent && o->parent->type == VDF_TYPE_ARRAY)
+				{
+					o = o->parent;
+					//assert(o->type == VDF_TYPE_ARRAY);
 
-                break;
+					o->data.data_array.len++;
+					o->data.data_array.data_value = realloc(o->data.data_array.data_value, (sizeof(void*)) * (o->data.data_array.len + 1));
+					o->data.data_array.data_value[o->data.data_array.len] = malloc(sizeof(struct vdf_object)),
+						o->data.data_array.data_value[o->data.data_array.len]->parent = o;
 
-            default:
-                if (!buf)
-                {
-                    // we found something we are probably not suppose to
-                    // the easiest way out is to just terminate
-                    vdf_free_object(root_object);
-                    return NULL;
-                }
-                break;
-            case '\r':
-            case CHAR_NEWLINE:
-            case CHAR_SPACE:
-            case CHAR_TAB:
-                break;
-        }
-        ++tail;
-    }
-    return root_object;
+					o = o->data.data_array.data_value[o->data.data_array.len];
+					o->key = NULL;
+					o->type = VDF_TYPE_NONE;
+					o->conditional = NULL;
+				}
+			}
+			else
+			{
+				size_t len = tail - buf;
+				o->key = local_strndup_escape(buf, len);
+				buf = NULL;
+			}
+			break;
+
+		case CHAR_OPEN_CURLY_BRACKET:
+			//assert(!buf);
+			//assert(o->type == VDF_TYPE_NONE);
+
+			if (o->parent && o->parent->type == VDF_TYPE_ARRAY)
+				o->parent->data.data_array.len++;
+
+			o->type = VDF_TYPE_ARRAY;
+			o->data.data_array.len = 0;
+			o->data.data_array.data_value = malloc((sizeof(void*)) * (o->data.data_array.len + 1));
+			o->data.data_array.data_value[o->data.data_array.len] = malloc(sizeof(struct vdf_object));
+			o->data.data_array.data_value[o->data.data_array.len]->parent = o;
+
+			o = o->data.data_array.data_value[o->data.data_array.len];
+			o->key = NULL;
+			o->type = VDF_TYPE_NONE;
+			o->conditional = NULL;
+			break;
+
+		case CHAR_CLOSED_CURLY_BRACKET:
+			//assert(!buf);
+
+			o = o->parent;
+			//assert(o);
+			if (o->parent)
+			{
+				o = o->parent;
+				//assert(o->type == VDF_TYPE_ARRAY);
+
+				o->data.data_array.data_value = realloc(o->data.data_array.data_value, (sizeof(void*)) * (o->data.data_array.len + 1));
+				o->data.data_array.data_value[o->data.data_array.len] = malloc(sizeof(struct vdf_object)),
+					o->data.data_array.data_value[o->data.data_array.len]->parent = o;
+
+				o = o->data.data_array.data_value[o->data.data_array.len];
+				o->key = NULL;
+				o->type = VDF_TYPE_NONE;
+				o->conditional = NULL;
+			}
+			else
+			{
+				root_object->type = VDF_TYPE_ARRAY;
+
+				return root_object;
+			}
+
+			break;
+
+		case CHAR_FRONTSLASH:
+			if (!buf)
+				while (*tail != '\0' && *tail != CHAR_NEWLINE)
+					++tail;
+
+			break;
+
+		case CHAR_OPEN_ANGLED_BRACKET:
+			if (!buf)
+			{
+				struct vdf_object* prev = o->parent->data.data_array.data_value[o->parent->data.data_array.len - 1];
+				//assert(!prev->conditional);
+
+				buf = tail + 1;
+
+				while (*tail != '\0' && *tail != CHAR_CLOSED_ANGLED_BRACKET)
+					++tail;
+
+				prev->conditional = local_strndup_escape(buf, tail - buf);
+
+				buf = NULL;
+			}
+
+			break;
+
+		default:
+			if (!buf)
+			{
+				// we found something we are probably not suppose to
+				// the easiest way out is to just terminate
+				vdf_free_object(root_object);
+				return NULL;
+			}
+			break;
+		case CHAR_SPACE:
+		case CHAR_TAB:
+			break;
+		}
+		++tail;
+	}
+	return root_object;
 }
 
 struct vdf_object* vdf_parse_file(const char* path)
