@@ -907,6 +907,8 @@ void GameDLLInit( void )
 
 
 map_void_t exports;
+export_list_t export_list = { 0,0,0 };
+export_list_t* current_export_list = &export_list;
 
 ps3std_t* stds;
 
@@ -920,10 +922,14 @@ extern "C" void GiveFnptrsToDll(enginefuncs_t * pengfuncsFromEngine, globalvars_
 int main(int argc, void* args)
 {
 	stds = ((package_t*)args)->stds;
-	//map_init(&exports); -- should get initialized by entities
 	map_set(&exports, "GetEntityAPI", GetEntityAPI);
 	map_set(&exports, "GetEntityAPI2", GetEntityAPI2);
 	map_set(&exports, "GiveFnptrsToDll", GiveFnptrsToDll);
+	while (current_export_list->next)
+	{
+		map_set(&exports, current_export_list->name, current_export_list->value);
+		current_export_list = current_export_list->next;
+	}
 	((package_t*)args)->exports = &exports;
 	return 0;
 }

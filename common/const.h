@@ -783,4 +783,6 @@ typedef struct
 	int	hitgroup;		// 0 == generic, non zero is specific body part
 } trace_t;
 
+
+
 #endif//CONST_H

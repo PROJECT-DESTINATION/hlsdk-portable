@@ -105,22 +105,36 @@ typedef int BOOL;
 // The _declspec forces them to be exported by name so we can do a lookup with GetProcAddress()
 // The function is used to intialize / allocate the object for the entity
 
+#if XASH_PS3
+#define isspace(c) ((c) == ' ')
+#define isalpha(c) (((c) >= 'a' && (c) <= 'z') || ((c) >= 'A' && (c) <= 'Z'))
+#define toupper(c) (((c) >= 'a' && (c) <= 'z') ? (c) - ('a'-'A') : (c))
+#define isdigit(c) ((c) >= '0' && (c) <= '9')
+#endif
+
 #if CLIENT_DLL
 #define LINK_ENTITY_TO_CLASS(mapClassName,DLLClassName)
 #else // CLIENT_DLL
-#ifdef XASH_PS3
+#if XASH_PS3
+#include <sys/tty.h>
+#include <sys/timer.h>
+#include "../ps3/ps3structs.h"
+extern export_list_t* current_export_list;
 #define LINK_ENTITY_TO_CLASS(mapClassName,DLLClassName) void mapClassName(entvars_t* pev)\
 {\
 	GetClassPtr((DLLClassName*)pev);\
 }\
+export_list_t PS3Export_##mapClassName##_entry = {#mapClassName,mapClassName,0};\
 class PS3Export_##mapClassName \
 {\
 public:\
 	PS3Export_##mapClassName()\
 	{\
-		map_set(&exports,#mapClassName,mapClassName);\
+		PS3Export_##mapClassName##_entry.next = current_export_list;\
+		current_export_list = &PS3Export_##mapClassName##_entry;\
 	}\
-};
+}; \
+PS3Export_##mapClassName creator_##mapClassName;
 #else
 #define LINK_ENTITY_TO_CLASS(mapClassName,DLLClassName) extern "C" EXPORT void mapClassName( entvars_t *pev ); void mapClassName( entvars_t *pev ) { GetClassPtr( (DLLClassName *)pev ); }
 #endif

@@ -42,6 +42,15 @@ typedef struct
 	
 } ps3std_t;
 
+typedef struct export_list_s export_list_t;
+
+struct export_list_s
+{
+	const char* name;
+	void* value;
+	export_list_t* next;
+};
+
 typedef struct 
 {
 	ps3std_t* stds;
